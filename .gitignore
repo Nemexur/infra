@@ -1,0 +1,7 @@
+*.vscode
+*.vagrant
+*.github
+.DS_Store
+roles-galaxy
+collections-galaxy
+experimental*
