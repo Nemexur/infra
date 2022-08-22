@@ -1,0 +1,10 @@
+---
+- name: monitoring systemd reload
+  ansible.builtin.systemd:
+    daemon_reload: true
+    state: restarted
+    enabled: true
+    name: "{{ item }}"
+  loop:
+    - smartmon
+    - smartmon.timer

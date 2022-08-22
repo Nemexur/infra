@@ -1,0 +1,18 @@
+---
+- name: Ensure nvidia_gpu_exporter group exists
+  ansible.builtin.group:
+    name: "{{ nvidia_gpu_exporter_group }}"
+    state: present
+    system: true
+  when: nvidia_gpu_exporter_group != "root"
+
+- name: Ensure nvidia_gpu_exporter group exists
+  ansible.builtin.user:
+    name: "{{ nvidia_gpu_exporter_user }}"
+    groups: "{{ nvidia_gpu_exporter_group }}"
+    shell: /usr/sbin/nologin
+    home: /
+    append: true
+    system: true
+    create_home: false
+  when: nvidia_gpu_exporter_user != "root"

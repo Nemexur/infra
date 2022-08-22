@@ -1,0 +1,153 @@
+---
+#
+# Misc
+#
+docker_dir: /opt/docker/data
+hostname: "{{ inventory_hostname }}"
+github_token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+ssh_public_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+vpn_docker_network: "{{ vpn_docker_network_enabled | ternary('container:open-vpn', 'default') }}"
+#
+# system/users
+#
+home_system_users:
+  - name: "{{ username }}"
+    password: "{{ password | password_hash('sha512', 'ansible') }}"
+    groups:
+      - users
+      - "{{ sudo_group }}"
+    append: true
+  - name: dockeruser
+    uid: "{{ guid | int }}"
+    groups:
+      - users
+      - "{{ sudo_group }}"
+    append: true
+sambashare_group_name: sambashare
+sambashare_gid: 1003
+#
+# Packages
+#
+system_extra_packages:
+  - iperf3
+  - speedtest-cli
+  - htop
+  - stow
+  - git
+  - neofetch
+  - neovim
+  - tmux
+  - mosh
+  - rsync
+  - lm-sensors
+  - iotop
+  - ncdu
+  - hddtemp
+  - mergerfs
+system_python_packages:
+  - python3.9
+  - python3.9-dev
+  - python3.9-venv
+  - python3-pip
+system_python_pip_packages:
+  - docker
+#
+# geerlingguy.docker
+#
+docker_edition: ce
+docker_package: "docker-{{ docker_edition }}"
+docker_package_state: present
+docker_service_state: started
+docker_service_enabled: true
+docker_restart_handler_state: restarted
+docker_install_compose: true
+docker_compose_version: v2.7.0
+docker_compose_arch: x86_64
+docker_compose_path: /usr/local/bin/docker-compose
+docker_users:
+  - "{{ username }}"
+  - dockeruser
+#
+# MergerFS
+#
+mergerfs_root: "/home/{{ username }}/tmp"
+#
+# bertvv.samba
+#
+samba_server_string: "{{ hostname }}"
+samba_users:
+  - name: "{{ username }}"
+    password: "{{ password }}"
+samba_global_include: global-include.conf
+samba_apple_extensions: true
+samba_mitigate_cve_2017_7494: false
+samba_server_max_protocol: "SMB3"
+samba_server_min_protocol: "SMB3"
+samba_shares:
+  - name: Media
+    guest_ok: false
+    public: false
+    read_only: false
+    writable: true
+    browseable: true
+    directory_mode: "0775"
+    owner: "{{ default_owner.name }}"
+    group: "{{ sambashare_group_name }}"
+    path: "{{ mergerfs_root }}/Media"
+    valid_users: "{{ samba_users | map(attribute='name') | join (', ') }}"
+    write_list: "{{ samba_users | map(attribute='name') | join (', ') }}"
+  - name: Downloads
+    guest_ok: false
+    public: false
+    read_only: false
+    writable: true
+    browseable: true
+    directory_mode: "0775"
+    owner: "{{ default_owner.name }}"
+    group: "{{ sambashare_group_name }}"
+    path: "{{ mergerfs_root }}/Downloads"
+    valid_users: "{{ samba_users | map(attribute='name') | join (', ') }}"
+    write_list: "{{ samba_users | map(attribute='name') | join (', ') }}"
+#
+# filesystem/cron
+#
+cron_jobs:
+  - name: backup docker dir
+    minute: 10
+    hour: "*/2"
+    job: >-
+      docker stop $(docker ps -q);
+      rsync -avz --delete --exclude cache {{ docker_dir }} {{ mergerfs_root }}/docker-data;
+      docker start $(docker ps -a -q)
+#
+# network/traefik
+#
+traefik_internal_network_name: traefik_internal_network
+traefik_internal_network_subnet: 172.28.0.0/16
+traefik_internal_network_iprange: 172.28.13.0/24
+traefik_internal_network_gateway: 172.28.13.1
+traefik_internal_network_base: "{{ '.'.join(traefik_internal_network_iprange.split('.')[0:3]) }}"
+#
+# containers/system/pihole
+#
+pihole_password: "{{ password }}"
+pihole_web_port: "1234"
+#
+# dashboard/homer
+#
+homer_title: Well, he's very dear to my heart.
+homer_subtitle: You don't remember anything, do you?
+homer_external_applications:
+  - name: Grafana
+    url: "http://grafana.{{ host_local }}"
+    logo: assets/tools/homer-icons/grafana.png
+    subtitle: Monitoring solution for every database
+    category: system
+#
+# Node Exporter
+#
+node_exporter_enabled_collectors:
+  - systemd
+  - network_route
+  - textfile:
+      directory: "/var/lib/node_exporter"

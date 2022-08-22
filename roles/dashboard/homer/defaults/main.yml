@@ -1,0 +1,16 @@
+---
+url: "home.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.20"
+
+homer_theme_repo: walkxcode/homer-theme
+homer_theme_version: v2.0.1
+homer_theme_custom_css_path: assets/custom.css
+homer_title: Your title
+homer_subtitle: Your subtitle
+homer_external_applications: []
+
+container_name: homer
+container_image: b4bz/homer:latest
+container_labels:
+  traefik.http.routers.homer.rule: Host(`{{ url }}`)
+  traefik.http.services.homer.loadbalancer.server.port: "8080"

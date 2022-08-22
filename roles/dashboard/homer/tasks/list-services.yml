@@ -1,0 +1,37 @@
+---
+- name: Get a list of containers
+  delegate_to: localhost
+  become: false
+  ansible.builtin.find:
+    paths:
+      - "{{ playbook_dir }}/roles/containers/services"
+      - "{{ playbook_dir }}/roles/containers/media"
+      - "{{ playbook_dir }}/roles/containers/system"
+      - "{{ playbook_dir }}/roles/network"
+    file_type: directory
+    excludes: homer
+    recurse: false
+  register: infra_containers
+
+- name: Include all defaults/main.yml files
+  ansible.builtin.include_vars:
+    dir: "{{ item.path }}/defaults"
+    files_matching: main.yml
+    name: "{{ item.path.split('/')[-1] }}"
+  loop: "{{ infra_containers.files }}"
+
+- name: Empty the variables (In case the task is called twice)
+  ansible.builtin.set_fact:
+    web_applications: []
+  when: web_applications is defined
+
+- name: Populate the dictionary of all containers
+  ansible.builtin.set_fact:
+    web_applications: >-
+      {{ web_applications | default([]) +
+      [{'logo': 'assets/tools/homer-icons/' + item.path.split('/')[-1] + '.png',
+      'name': lookup('vars', item.path.split('/')[-1])['dashboard_name'] | default(item.path.split('/')[-1] | title),
+      'url' : 'http://' + (lookup('vars', item.path.split('/')[-1])['url'] | default('')),
+      'subtitle' : lookup('vars', item.path.split('/')[-1])['homer_subtitle'] | default(''),
+      'category': lookup('vars', item.path.split('/')[-1])['homer_category'] | default ('')}] }}
+  loop: "{{ infra_containers.files }}"

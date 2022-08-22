@@ -1,0 +1,13 @@
+---
+url: "transmission.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.18"
+
+dashboard_name: Transmission
+homer_category: services
+homer_subtitle: Cross-platform BitTorrent client
+
+container_name: transmission
+container_image: lscr.io/linuxserver/transmission:latest
+container_labels:
+  traefik.http.routers.transmission.rule: Host(`{{ url }}`)
+  traefik.http.services.transmission.loadbalancer.server.port: "9091"

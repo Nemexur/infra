@@ -1,0 +1,17 @@
+---
+- name: Get grafana dashboard templates
+  delegate_to: localhost
+  become: false
+  ansible.builtin.find:
+    paths: "{{ grafana_templates_dir }}"
+    patterns: "*.j2"
+  register: _grafana_templates
+
+- name: Generate dashboards from templates
+  delegate_to: localhost
+  become: false
+  ansible.builtin.template:
+    src: "{{ item.path }}"
+    dest: "{{ grafana_dashboards_dir }}/{{ (item.path | basename).split('.')[:-1] }}"
+    mode: 0644
+  loop: "{{ _grafana_templates.files }}"

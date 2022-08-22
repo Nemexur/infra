@@ -1,0 +1,13 @@
+---
+url: "bazarr.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.10"
+
+dashboard_name: Bazarr
+homer_category: media
+homer_subtitle: Download subtitles based on your requirements
+
+container_name: bazarr
+container_image: lscr.io/linuxserver/bazarr:latest
+container_labels:
+  traefik.http.routers.bazarr.rule: Host(`{{ url }}`)
+  traefik.http.services.bazarr.loadbalancer.server.port: "6767"

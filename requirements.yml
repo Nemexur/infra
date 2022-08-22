@@ -1,0 +1,14 @@
+---
+roles:
+  - name: bertvv.samba
+  - name: mrlesmithjr.zfs
+  - name: stuvusit.smartd
+  - name: geerlingguy.ntp
+  - name: geerlingguy.docker
+  - name: geerlingguy.security
+  - name: cloudalchemy.grafana
+  - name: cloudalchemy.prometheus
+  # TODO: Remove src and version after new release
+  - name: cloudalchemy.node_exporter
+    src: https://github.com/cloudalchemy/ansible-node-exporter.git
+    version: c2401cfed554906843520cbac7ae2a3a132c590e

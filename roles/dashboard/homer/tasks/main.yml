@@ -1,0 +1,4 @@
+---
+- import_tasks: list-services.yml
+- import_tasks: assets.yml
+- import_tasks: docker.yml

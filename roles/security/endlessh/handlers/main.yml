@@ -1,0 +1,6 @@
+---
+- name: restart endlessh
+  ansible.builtin.systemd:
+    name: endlessh
+    daemon_reload: true
+    state: restarted

@@ -1,0 +1,75 @@
+---
+- name: Ensure required directories are present
+  ansible.builtin.file:
+    dest: "{{ item.dest | default(item) }}"
+    state: directory
+    mode: 0775
+    owner: "{{ item.owner | default(default_owner.name) }}"
+    group: "{{ item.group | default(default_group.name) }}"
+  loop:
+    - "{{ docker_dir }}/{{ container_name }}"
+
+- name: "Find all files in {{ vpn_directory }}"
+  become: false
+  delegate_to: localhost
+  ansible.builtin.find:
+    paths: "{{ vpn_directory }}"
+    file_type: file
+    recurse: true
+    patterns: "*.txt,*.ovpn"
+  register: open_vpn_clients
+
+- name: "Get stats of files in {{ docker_dir }}/{{ container_name }}"
+  ansible.builtin.stat:
+    path: "{{ docker_dir }}/{{ container_name }}/clients/{{ item.path | replace(vpn_directory + '/', '') }}"
+  loop: "{{ open_vpn_clients.files }}"
+  register: open_vpn_clients
+
+- name: Update open-vpn docker client
+  when: not open_vpn_clients.results | map(attribute='stat') | map(attribute='exists') | min
+  block:
+    - name: Copy open-vpn clients
+      ansible.builtin.copy:
+        src: "{{ vpn_directory }}/"
+        dest: "{{ docker_dir }}/{{ container_name }}/clients"
+        mode: 0775
+        owner: "{{ default_owner.name }}"
+        group: "{{ default_group.name }}"
+
+    - name: Ensure ip6table_filter module is present
+      community.general.modprobe: name=ip6table_filter state=present
+
+- name: "Ensure {{ container_name }} docker client is up and running"
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    state: started
+    restart_policy: unless-stopped
+    image: dperson/openvpn-client:latest
+    networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    env:
+      TZ: "{{ timezone }}"
+      DNS: "true"
+      FIREWALL: ""
+      ROUTE_TRAEFIK_NETWORK: "{{ traefik_internal_network_iprange }}"
+    capabilities:
+      - NET_ADMIN
+    dns_servers:
+      - 1.1.1.1
+      - 8.8.8.8
+      - 4.4.4.4
+    security_opts:
+      - label:disable
+    ports:
+      # Deluge Ports
+      - 58846:58846/tcp
+      - 58846:58846/udp
+      - 6881:6881/tcp
+      - 6881:6881/udp
+    volumes:
+      - /dev/net:/dev/net:z
+      - "{{ docker_dir }}/{{ container_name }}/clients:/vpn"
+    recreate: "{{ not open_vpn_clients.results | map(attribute='stat') | map(attribute='exists') | min }}"

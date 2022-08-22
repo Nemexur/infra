@@ -1,0 +1,6 @@
+---
+- import_tasks: essential.yml
+- import_tasks: user.yml
+
+- include_tasks: powersaving.yml
+  when: powersaving_enabled | default(false) | bool

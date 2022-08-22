@@ -1,0 +1,48 @@
+---
+- name: Ensure required directories are present
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: directory
+    mode: 0755
+  loop:
+    - "{{ docker_dir }}/{{ container_name }}"
+    - "{{ docker_dir }}/{{ container_name }}/configurations"
+
+- name: Copy static configuration
+  ansible.builtin.template:
+    src: traefik.yml.j2
+    dest: "{{ docker_dir }}/{{ container_name }}/traefik.yml"
+    mode: 0644
+  register: traefik_static_config
+
+- name: Generate dynamic configuration
+  ansible.builtin.template:
+    src: dynamic.yml.j2
+    dest: "{{ docker_dir }}/{{ container_name }}/configurations/dynamic.yml"
+    mode: 0644
+  register: traefik_dynamic_config
+
+- name: "Ensure {{ container_name }} container is up and running"
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    state: started
+    image: "{{ container_image }}"
+    pull: true
+    restart_policy: unless-stopped
+    networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    env:
+      TZ: "{{ timezone }}"
+    ports:
+      - "{{ traefik_web_port }}:80"
+      - 443:443
+      - 8080:8080
+    volumes:
+      - "{{ docker_dir }}/{{ container_name }}/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "{{ docker_dir }}/{{ container_name }}/configurations:/configurations"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels: "{{ container_labels }}"
+    recreate: "{{ (traefik_static_config is changed) or (traefik_dynamic_config is changed) }}"

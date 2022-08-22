@@ -1,0 +1,20 @@
+---
+- name: netplan apply
+  ansible.builtin.command: netplan apply
+
+- name: remove default user
+  ansible.builtin.user:
+    name: ubuntu
+    state: absent
+
+- name: powersaving systemd reload
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: true
+    daemon_reload: true
+  loop:
+    - powertop
+    - powertop.timer
+    - cpupower-min
+    - cpupower-min.timer

@@ -1,0 +1,15 @@
+---
+url: "traefik.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.22"
+
+traefik_web_port: "80"
+
+dashboard_name: Traefik
+homer_category: system
+homer_subtitle: Networking Stack That Just Works
+
+container_name: traefik
+container_image: traefik:v2.8
+container_labels:
+  traefik.http.routers.dash.rule: Host(`{{ url }}`)
+  traefik.http.routers.dash.service: api@internal

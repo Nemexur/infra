@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+# {{ ansible_managed }}
+
+set -ex
+
+ONDEMAND_CELLULAR="{{ algo_ondemand_cellular }}"
+ONDEMAND_WIFI="{{ algo_ondemand_wifi }}"
+ONDEMAND_WIFI_EXCLUDE="{{ algo_ondemand_wifi_exclude }}"
+STORE_PKI="{{ algo_store_pki }}"
+DNS_ADBLOCKING="{{ algo_dns_adblocking }}"
+SSH_TUNNELING="{{ algo_ssh_tunneling }}"
+ENDPOINT="{{ algo_endpoint }}"
+EXTRA_VARS="{{ algo_extra_vars }}"
+ANSIBLE_EXTRA_ARGS="{{ algo_ansible_extra_args }}"
+
+deployAlgo() {
+  cd {{ algo_install_path }}
+
+  . .venv/bin/activate
+
+  export HOME=/root
+  export ANSIBLE_LOCAL_TEMP=/root/.ansible/tmp
+  export ANSIBLE_REMOTE_TEMP=/root/.ansible/tmp
+
+  # shellcheck disable=SC2086
+  ansible-playbook main.yml \
+    -e provider=local \
+    -e "ondemand_cellular=${ONDEMAND_CELLULAR}" \
+    -e "ondemand_wifi=${ONDEMAND_WIFI}" \
+    -e "ondemand_wifi_exclude=${ONDEMAND_WIFI_EXCLUDE}" \
+    -e "store_pki=${STORE_PKI}" \
+    -e "dns_adblocking=${DNS_ADBLOCKING}" \
+    -e "ssh_tunneling=${SSH_TUNNELING}" \
+    -e "endpoint=${ENDPOINT}" \
+    -e "ssh_user=${SSH_USER}" \
+    -e tests=true \
+    -e server=localhost \
+    -e "${EXTRA_VARS}" \
+    --skip-tags debug ${ANSIBLE_EXTRA_ARGS} |
+      tee {{ algo_log_file }}
+}
+
+deployAlgo

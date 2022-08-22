@@ -1,0 +1,85 @@
+---
+title: {{ homer_title }}
+subtitle: {{ homer_subtitle }}
+logo: "assets/tools/homer-icons/logo.png"
+
+stylesheet:
+  - "{{ homer_theme_custom_css_path }}"
+
+header: true
+footer: false
+columns: 3
+connectivityCheck: true
+
+proxy:
+  useCredentials: false
+
+theme: default
+colors:
+  light:
+    highlight-primary: "#fff5f2"
+    highlight-secondary: "#fff5f2"
+    highlight-hover: "#bebebe"
+    background: "#12152B"
+    card-background: "rgba(255, 245, 242, 0.8)"
+    text: "#ffffff"
+    text-header: "#fafafa"
+    text-title: "#000000"
+    text-subtitle: "#111111"
+    card-shadow: rgba(0, 0, 0, 0.5)
+    link: "#3273dc"
+    link-hover: "#2e4053"
+    status-online: "#7cfc00"
+    status-offline: "#ee4b2b"
+    background-image: "assets/wallpaper-light.jpeg"
+  dark:
+    highlight-primary: "#181C3A"
+    highlight-secondary: "#181C3A"
+    highlight-hover: "#1F2347"
+    background: "#12152B"
+    card-background: "rgba(24, 28, 58, 0.8)"
+    text: "#eaeaea"
+    text-header: "#7C71DD"
+    text-title: "#fafafa"
+    text-subtitle: "#8B8D9C"
+    card-shadow: rgba(0, 0, 0, 0.5)
+    link: "#c1c1c1"
+    link-hover: "#fafafa"
+    status-online: "#7cfc00"
+    status-offline: "#ee4b2b"
+    background-image: "assets/wallpaper.jpeg"
+
+services:
+  - name: "//Media"
+    icon: "fas fa-photo-video"
+    items:
+  {% for item in ((web_applications + homer_external_applications) | sort(attribute='name')) if "media" in item.category and item.url != "" %}
+    - name: "{{ item.name }}"
+        logo: "{{ item.logo }}"
+        url: "{{ item.url }}"
+        subtitle: "{{ item.subtitle }}"
+        tagstyle: "is-info"
+        target: "_blank"
+  {% endfor %}
+
+  - name: "//Services"
+    icon: "fas fa-stream"
+    items:
+  {% for item in ((web_applications + homer_external_applications) | sort(attribute='name')) if "services" in item.category and item.url != "" %}
+    - name: "{{ item.name }}"
+        logo: "{{ item.logo }}"
+        url: "{{ item.url }}"
+        subtitle: "{{ item.subtitle }}"
+        target: "_blank"
+  {% endfor %}
+
+  - name: "//System"
+    icon: "fas fa-cog"
+    items:
+  {% for item in ((web_applications + homer_external_applications) | sort(attribute='name')) if "system" in item.category and item.url != "" %}
+    - name: "{{ item.name }}"
+        logo: "{{ item.logo }}"
+        url: "{{ item.url }}"
+        subtitle: "{{ item.subtitle }}"
+        target: "_blank"
+  {% endfor %}

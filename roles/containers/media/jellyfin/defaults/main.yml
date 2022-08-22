@@ -1,0 +1,13 @@
+---
+url: "jellyfin.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.12"
+
+dashboard_name: Jellyfin
+homer_category: media
+homer_subtitle: Free Software Media System
+
+container_name: jellyfin
+container_image: lscr.io/linuxserver/jellyfin:latest
+container_labels:
+  traefik.http.routers.jellyfin.rule: Host(`{{ url }}`)
+  traefik.http.services.jellyfin.loadbalancer.server.port: "8096"

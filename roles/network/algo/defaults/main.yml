@@ -1,0 +1,25 @@
+---
+algo_apt_repos:
+  - ppa:deadsnakes/ppa
+algo_install_packages:
+  - python3.8
+  - python3.8-dev
+  - python3.8-venv
+  - python3-pip
+  - software-properties-common
+algo_additional_python_packages:
+  - wheel==0.30.0
+  - name: pip
+    state: latest
+  - name: virtualenv
+    state: latest
+# Install script variables
+algo_ondemand_cellular: false
+algo_ondemand_wifi: false
+algo_ondemand_wifi_exclude: _null
+algo_store_pki: true
+algo_dns_adblocking: false
+algo_ssh_tunneling: false
+algo_extra_vars: placeholder=null
+algo_ansible_extra_args: ""
+algo_log_file: "/var/log/algo.log"

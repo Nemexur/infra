@@ -1,0 +1,10 @@
+---
+- name: Ensure internal traefik network is present
+  when: traefik_internal_enabled | default(false) | bool
+  community.docker.docker_network:
+    name: "{{ traefik_internal_network_name }}"
+    state: present
+    ipam_config:
+      - subnet: "{{ traefik_internal_network_subnet }}"
+        iprange: "{{ traefik_internal_network_iprange }}"
+        gateway: "{{ traefik_internal_network_gateway }}"

@@ -1,0 +1,10 @@
+---
+url: "plex.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.13"
+
+dashboard_name: Plex
+homer_category: media
+homer_subtitle: Personal media libraries and streams
+
+container_name: plex
+container_image: lscr.io/linuxserver/plex:latest

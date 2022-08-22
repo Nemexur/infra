@@ -1,0 +1,42 @@
+---
+- name: Check nvidia repo gpgkey
+  ansible.builtin.stat:
+    path: "{{ nvidia_docker_gpg_keyring_path }}"
+  register: nvidia_gpg_keyring
+
+- name: Download nvidia gpgkey
+  when: not nvidia_gpg_keyring.stat.exists
+  block:
+  - name: "Download gpgkey from {{ nvidia_docker_url }}"
+    ansible.builtin.get_url:
+      url: "https://{{ nvidia_docker_url }}/gpgkey"
+      mode: 0644
+      dest: /tmp/libnvidiagpg
+
+  - name: Pack gpgkey with dearmor
+    ansible.builtin.shell:
+      cmd: "gpg --dearmor -o < /tmp/libnvidiagpg > {{ nvidia_docker_gpg_keyring_path }}"
+      creates: "{{ nvidia_docker_gpg_keyring_path }}"
+
+- name: Get nvidia-docker apt repos
+  ansible.builtin.uri:
+    url: "https://{{ nvidia_docker_url }}/{{ nvidia_docker_id }}/libnvidia-container.list"
+    return_content: true
+  register: nvidia_docker_apt_list
+
+- name: Ensure nvidia-docker apt repos are present
+  ansible.builtin.apt_repository:
+    repo: "{{ item | regex_replace('(#?)deb', 'deb [signed-by='+nvidia_docker_gpg_keyring_path+']') }}"
+    state: present
+    filename: "{{ nvidia_docker_apt_filename }}"
+    update_cache: true
+  when: item | length > 0
+  loop: "{{ nvidia_docker_apt_list.content.split('\n') }}"
+
+- name: Ensure nvidia packages are present
+  ansible.builtin.apt:
+    name: "{{ item.name | default(item) }}"
+    state: "{{ item.state | default('present') }}"
+    update_cache: true
+  loop: "{{ nvidia_docker_packages }}"
+  notify: restart systemd docker

@@ -1,0 +1,13 @@
+---
+url: "cadvisor.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.24"
+
+dashboard_name: cAdvisor
+homer_category: system
+homer_subtitle: Resource usage and performance characteristics of containers
+
+container_name: cadvisor
+container_image: gcr.io/cadvisor/cadvisor:latest
+container_labels:
+  traefik.http.routers.cadvisor.rule: Host(`{{ url }}`)
+  traefik.http.services.cadvisor.loadbalancer.server.port: "8080"

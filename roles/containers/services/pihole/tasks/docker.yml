@@ -1,0 +1,41 @@
+---
+- name: Ensure required directories are present
+  ansible.builtin.file:
+    dest: "{{ item.dest | default(item) }}"
+    state: directory
+    mode: 0775
+    owner: "{{ item.owner | default(default_owner.name) }}"
+    group: "{{ item.group | default(default_group.name) }}"
+  loop:
+    - "{{ docker_dir }}/{{ container_name }}"
+    - "{{ docker_dir }}/{{ container_name }}/pihole"
+    - "{{ docker_dir }}/{{ container_name }}/dnsmasq.d"
+
+- name: Ensure {{ container_name }} container is up and running
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    state: started
+    restart_policy: unless-stopped
+    image: "{{ container_image }}"
+    pull: true
+    privileged: true
+    network_mode: host
+    capabilities:
+      - NET_ADMIN
+      - NET_BROADCAST
+    env:
+      ServerIp: "{{ ansible_default_ipv4.gateway }}"
+      TZ: "{{ timezone }}"
+      WEBPASSWORD: "{{ pihole_password }}"
+      REV_SERVER: "true"
+      REV_SERVER_DOMAIN: "{{ host_local }}"
+      REV_SERVER_TARGET: "{{ ansible_default_ipv4.gateway }}"
+      REV_SERVER_CIDR: "{{ '.'.join(ansible_default_ipv4.address.split('.')[0:3]) }}.0/24"
+      PIHOLE_DNS: "127.0.0.1#5335"
+      DNSSEC: "true"
+      DNSMASQ_LISTENING: all
+      DOMAIN_NAME: "{{ url }}"
+      WEB_PORT: "{{ pihole_web_port }}"
+    volumes:
+      - "{{ docker_dir }}/{{ container_name }}/pihole:/etc/pihole"
+      - "{{ docker_dir }}/{{ container_name }}/dnsmasq.d:/etc/dnsmasq.d"

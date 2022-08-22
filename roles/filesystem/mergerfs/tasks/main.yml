@@ -1,0 +1,43 @@
+---
+- name: Ensure mergerfs is present
+  ansible.builtin.apt:
+    name: mergerfs
+    state: present
+
+- name: Ensure mount points exists for drive
+  ansible.builtin.file:
+    dest: "{{ item.name }}"
+    mode: 0775
+    state: directory
+    owner: "{{ default_owner.name }}"
+    group: "{{ default_group.name }}"
+  loop: "{{ mergerfs_disks_array }}"
+  when: mergerfs_mount_disks[0] is defined
+
+- name: Mount the data drives
+  ansible.posix.mount:
+    name: "{{ item.path }}"
+    src: "{{ item.src }}"
+    fstype: xfs
+    state: mounted
+    passno: "2"
+  loop: "{{ mergerfs_disks_array }}"
+  when: mergerfs_mount_disks[0] is defined
+
+- name: "Ensure mount point exists for {{ mergerfs_root }}"
+  ansible.builtin.file:
+    dest: "{{ mergerfs_root }}"
+    mode: 0775
+    state: directory
+    owner: "{{ default_owner.name }}"
+    group: "{{ default_group.name }}"
+  when: mergerfs_disks_array[0] is defined
+
+- name: Mount the mergerfs array
+  ansible.posix.mount:
+    name: "{{ mergerfs_root }}"
+    src: "{{ mergerfs_disks_array | join(':') }}"
+    opts: direct_io,defaults,allow_other,moveonenospc=1,minfreespace=100G,fsname=mergerfs
+    fstype: fuse.mergerfs
+    state: mounted
+  when: mergerfs_disks_array[0] is defined

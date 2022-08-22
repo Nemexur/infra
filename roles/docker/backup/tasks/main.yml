@@ -1,0 +1,49 @@
+---
+- name: Handle persistent data
+  when: nas_stuff_enabled | default(false) | bool
+  block:
+    - name: Check if the persistent data folder exists on the remote machine
+      ansible.builtin.stat:
+        path: "{{ docker_dir }}"
+      register: persistent_data
+
+    - name: Check if the persistent data folder is empty
+      ansible.builtin.find:
+        paths: "{{ docker_dir }}/"
+        file_type: any
+        recurse: true
+      register: persistent_data_find
+
+    - name: Create the persistent data folder on the remote machine
+      ansible.builtin.file:
+        dest: "{{ docker_dir }}"
+        state: directory
+        mode: 0775
+        owner: "{{ default_owner.name }}"
+        group: "{{ default_group.name }}"
+      when: not persistent_data.stat.exists
+
+    - name: "Check if the {{ mergerfs_root }}/docker-data exists"
+      ansible.builtin.stat:
+        path: "{{ mergerfs_root }}/docker-data"
+      register: backup_data
+
+    - name: Restore the "{{ docker_dir }}" folder from the MergerFS array
+      ansible.posix.synchronize:
+        src: "{{ mergerfs_root }}/docker-data"
+        dest: "{{ docker_dir }}/"
+        delete: true
+        recursive: true
+      delegate_to: "{{ inventory_hostname }}"
+      when:
+        - backup_data.stat.exists
+        - persistent_data_find.matched < 20 or not persistent_data.stat.exists
+
+- name: Chmod the data folder
+  ansible.builtin.file:
+    dest: "{{ docker_dir }}"
+    state: directory
+    mode: 0775
+    owner: "{{ default_owner.name }}"
+    group: "{{ default_group.name }}"
+    recurse: true

@@ -1,0 +1,74 @@
+---
+- name: Ensure apt-get is updated
+  ansible.builtin.apt:
+    upgrade: true
+    autoremove: true
+    update_cache: true
+
+- name: Ensure apt python repo is present
+  ansible.builtin.apt_repository:
+    repo: "{{ item.repo | default(item) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ algo_apt_repos }}"
+
+- name: Ensure apt packages are present
+  ansible.builtin.apt: "name={{ item }} state=present"
+  loop: "{{ algo_install_packages }}"
+
+- name: Ensure algo-vpn repository is present
+  ansible.builtin.git:
+    repo: https://github.com/trailofbits/algo.git
+    dest: "{{ algo_install_path }}"
+    version: master
+    single_branch: true
+    update: false
+
+- name: Copy configuration file for algo-vpn
+  ansible.builtin.copy:
+    src: config.cfg
+    dest: "{{ algo_install_path }}/config.cfg"
+    mode: 0644
+
+- name: Copy install file for algo-vpn
+  ansible.builtin.template:
+    src: install.sh.j2
+    dest: "{{ algo_install_path }}/install.sh"
+    mode: 0744
+
+- name: Ensure additional python dependencies are installed
+  ansible.builtin.pip:
+    name: "{{ item.name | default(item) }}"
+    state: "{{ item.state | default('present') }}"
+    virtualenv: "{{ algo_install_path }}/.venv"
+    virtualenv_command: "python3.8 -m venv"
+  loop: "{{ algo_additional_python_packages }}"
+
+- name: Ensure algo-vpn requirements are installed
+  ansible.builtin.pip:
+    requirements: "{{ algo_install_path }}/requirements.txt"
+    virtualenv: "{{ algo_install_path }}/.venv"
+
+- name: Run algo-vpn install
+  ansible.builtin.command: "{{ algo_install_path }}/install.sh"
+  args:
+    creates: "{{ algo_install_path }}/configs/localhost"
+
+- name: Save algo-vpn install log
+  ansible.builtin.fetch:
+    src: "{{ algo_log_file }}"
+    dest: "{{ fetch_files_dir }}/algo"
+    mode: 0644
+
+- name: Get config files to fetch
+  ansible.builtin.find:
+    paths: "{{ algo_install_path }}/configs"
+    file_type: file
+    recurse: true
+  register: algo_configs
+
+- name: Save algo-vpn configs
+  ansible.builtin.fetch:
+    src: "{{ item.path }}"
+    dest: "{{ fetch_files_dir }}/algo"
+    mode: 0644
+  loop: "{{ algo_configs.files }}"

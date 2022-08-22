@@ -1,0 +1,13 @@
+---
+url: "prowlarr.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.14"
+
+dashboard_name: Prowlarr
+homer_category: media
+homer_subtitle: Integrate with your various PVR apps
+
+container_name: prowlarr
+container_image: lscr.io/linuxserver/prowlarr:develop
+container_labels:
+  traefik.http.routers.prowlarr.rule: Host(`{{ url }}`)
+  traefik.http.services.prowlarr.loadbalancer.server.port: "9696"

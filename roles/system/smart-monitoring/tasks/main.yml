@@ -1,0 +1,96 @@
+#
+# Process-exporter
+#
+- name: Ensure packages python3 and pip are installed.
+  ansible.builtin.package: "name={{ item }} state=present"
+  loop:
+    - python3
+    - python3-pip
+
+- name: Ensure required python are installed.
+  ansible.builtin.pip: "name={{ item.name | default(item) }} state={{ item.state | default('present') }}"
+  loop:
+    - name: pip
+      state: latest
+    - cryptography==3.4.8
+    - github3.py
+
+- name: Check if process-exporter is installed
+  ansible.builtin.command: which process-exporter
+  register: process_exporter
+  changed_when: false
+  failed_when: false
+
+- name: Check the process-exporter version if installed
+  ansible.builtin.shell:
+    cmd: "process-exporter --version | grep -o '[0-9]\\.[0-9]*\\.[0-9]*'"
+  register: process_exporter_version
+  when: process_exporter.rc == 0
+  changed_when: false
+
+- name: Set current process-exporter version to 0 if not installed
+  ansible.builtin.set_fact:
+    process_exporter_version:
+      stdout: "0"
+  when: process_exporter.rc == 1
+
+- name: Check latest process-exporter release
+  community.general.github_release:
+    user: ncabatoff
+    repo: process-exporter
+    action: latest_release
+    token: "{{ github_token }}"
+  register: process_exporter_release
+  changed_when: process_exporter_release.tag != ("v" + process_exporter_version.stdout)
+
+- name: Install latest process-exporter
+  ansible.builtin.apt:
+    deb: "https://github.com/ncabatoff/process-exporter/releases/download/{{ process_exporter_release.tag }}/process-exporter_{{ process_exporter_release.tag | regex_replace('^v','') }}_linux_{{ go_arch }}.deb"
+  when: process_exporter_release.tag != ("v" + process_exporter_version.stdout)
+
+#
+# Smartmon
+#
+- name: Ensure moreutils and smartmontools are installed
+  ansible.builtin.apt: "name={{ item }} state=present"
+  loop:
+    - moreutils
+    - smartmontools
+
+- name: Download smartmon.py
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/prometheus-community/node-exporter-textfile-collector-scripts/master/smartmon.py
+    dest: /usr/local/bin
+    owner: "{{ default_owner.name }}"
+    group: "{{ default_group.name }}"
+    mode: 0755
+
+- name: Make sure the text output directory exists
+  ansible.builtin.file:
+    path: "{{ smartmon_exporter_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ default_owner.name }}"
+    group: "{{ default_group.name }}"
+    mode: 0755
+
+- name: Install the systemd service
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    mode: 0755
+    owner: "root"
+    group: "root"
+  notify: monitoring systemd reload
+  loop:
+    - smartmon.service
+    - smartmon.timer
+
+- name: Start and enable the systemd services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - smartmon.timer
+    - process-exporter

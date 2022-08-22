@@ -1,0 +1,13 @@
+---
+url: "radarr.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.15"
+
+dashboard_name: Radarr
+homer_category: media
+homer_subtitle: Automatically monitor multiple RSS feeds for movies
+
+container_name: radarr
+container_image: lscr.io/linuxserver/radarr:latest
+container_labels:
+  traefik.http.routers.radarr.rule: Host(`{{ url }}`)
+  traefik.http.services.radarr.loadbalancer.server.port: "7878"

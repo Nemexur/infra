@@ -1,0 +1,13 @@
+---
+url: "portainer.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.19"
+
+dashboard_name: Portainer
+homer_category: system
+homer_subtitle: Service delivery platform for containerized applications
+
+container_name: portainer
+container_image: portainer/portainer-ce:latest
+container_labels:
+  traefik.http.routers.portainer.rule: Host(`{{ url }}`)
+  traefik.http.services.portainer.loadbalancer.server.port: "9000"

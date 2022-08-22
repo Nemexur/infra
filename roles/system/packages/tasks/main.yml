@@ -1,0 +1,17 @@
+---
+- name: Ensure extra packages are installed
+  ansible.builtin.package: "name={{ item.name | default(item) }} state={{ item.state | default('present') }}"
+  loop: "{{ system_extra_packages }}"
+
+- name: Ensure python repo is present
+  ansible.builtin.apt_repository: repo=ppa:deadsnakes/ppa state=present
+
+- name: Ensure python packages are installed
+  ansible.builtin.apt:
+    name: "{{ item.repo | default(item) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ system_python_packages }}"
+
+- name: Ensure pip packages are installed
+  ansible.builtin.pip: "name={{ item.name | default(item) }} state={{ item.state | default('present') }}"
+  loop: "{{ system_python_pip_packages }}"

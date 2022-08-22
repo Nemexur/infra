@@ -1,0 +1,246 @@
+---
+- name: Set ssh port
+  hosts: all
+  tags: always
+  gather_facts: false
+
+  tasks:
+    - import_tasks: tasks/ssh-juggle-port.yml
+
+- name: Run basic setup for all hosts
+  hosts: all
+  become: true
+  tags: always
+
+  roles:
+    - role: geerlingguy.ntp
+      ansible_os_family: "{{ ansible_facts['os_family'] }}"
+
+- name: Setup VPN to local network
+  hosts: vpn
+  become: true
+
+  roles:
+    - role: network/algo
+      tags: vpn
+      when: vpn_enabled | default(false) | bool
+
+- name: Setup home-server
+  hosts: home
+  become: true
+
+  vars:
+    ansible_distribution: "Ubuntu"
+
+  roles:
+    #
+    # Essential
+    #
+    - role: system/essential
+      tags: essential
+    - role: system/packages
+      tags:
+        - packages
+        - essential
+    #
+    # Filesystem
+    #
+    - role: mrlesmithjr.zfs
+      tags:
+        - zfs
+        - filesystem
+      when: nas_stuff_enabled | default(false) | bool
+    - role: filesystem/mergerfs
+      tags:
+        - mergerfs
+        - filesystem
+      when: nas_stuff_enabled | default(false) | bool
+    - role: bertvv.samba
+      tags:
+        - samba
+        - filesystem
+      when: samba_enabled | default(false) | bool
+    - role: filesystem/cron
+      tags:
+        - cron
+        - filesystem
+    #
+    # Docker
+    #
+    - role: geerlingguy.docker
+      tags: docker
+    - role: docker/nvidia
+      tags: docker
+      when: nvidia_docker_enabled | default(false) | bool
+    - role: docker/backup
+      tags: docker
+    #
+    # Network
+    #
+    - role: network/traefik
+      tags:
+        - traefik
+        - network
+        - apps
+      when: traefik_enabled | default(false) | bool
+    - role: network/openvpn
+      tags:
+        - openvpn
+        - network
+        - apps
+      when: vpn_docker_network_enabled | default(false) | bool
+    #
+    # Containers/System
+    #
+    - role: containers/system/cadvisor
+      tags:
+        - cadvisor
+        - containers
+        - containers/system
+        - apps
+    - role: containers/system/watchtower
+      tags:
+        - watchtower
+        - containers
+        - containers/system
+        - apps
+    - role: containers/system/portainer
+      tags:
+        - portainer
+        - containers
+        - containers/system
+        - apps
+    #
+    # Containers/Services
+    #
+    - role: containers/services/pihole
+      tags:
+        - pihole
+        - containers
+        - containers/services
+        - apps
+    - role: containers/services/transmission
+      tags:
+        - transmission
+        - containers
+        - containers/services
+        - apps
+    - role: containers/services/deluge
+      tags:
+        - deluge
+        - containers
+        - containers/services
+        - apps
+    #
+    # Containers/Media
+    #
+    - role: containers/media/bazarr
+      tags:
+        - bazarr
+        - containers
+        - containers/media
+        - apps
+    - role: containers/media/jackett
+      tags:
+        - jackett
+        - containers
+        - containers/media
+        - apps
+    - role: containers/media/jellyfin
+      tags:
+        - jellyfin
+        - containers
+        - containers/media
+        - apps
+    - role: containers/media/plex
+      tags:
+        - plex
+        - containers
+        - containers/media
+        - apps
+    - role: containers/media/prowlarr
+      tags:
+        - prowlarr
+        - containers
+        - containers/media
+        - apps
+    - role: containers/media/radarr
+      tags:
+        - radarr
+        - containers
+        - containers/media
+        - apps
+    - role: containers/media/readarr
+      tags:
+        - readarr
+        - containers
+        - containers/media
+        - apps
+    - role: containers/media/sonarr
+      tags:
+        - sonarr
+        - containers
+        - containers/media
+        - apps
+    #
+    # Dashboard
+    #
+    - role: dashboard/homer
+      tags:
+        - homer
+        - dashboard
+        - apps
+      when: dashboard_enabled | default(false) | bool
+    #
+    # Monitoring
+    #
+    - role: system/smart-monitoring
+      tags:
+        - smart
+        - monitoring
+      when: smart_monitoring_enabled | default(false) | bool
+    - role: stuvusit.smartd
+      tags:
+        - smart
+        - monitoring
+      when: smart_monitoring_enabled | default(false) | bool
+
+- name: Setup metric exporters
+  hosts: exporters
+  become: true
+  tags: monitoring
+
+  roles:
+    - role: cloudalchemy.node_exporter
+      tags:
+        - node
+        - exporters
+    - role: system/nvidia-gpu-exporter
+      tags:
+        - nvidia
+        - exporters
+
+- name: Setup monitoring system
+  hosts: monitoring
+  become: true
+  tags: monitoring
+
+  roles:
+    - role: cloudalchemy.prometheus
+      tags: prometheus
+    - role: cloudalchemy.grafana
+      tags: grafana
+
+- name: Setup security for all hosts
+  hosts: all
+  become: true
+  tags: security
+
+  roles:
+    - role: geerlingguy.security
+      when: security_enabled | default(false) | bool
+    - role: security/endlessh
+      tags: security/endlessh
+      when:
+        - security_enabled | default(false) | bool
+        - endlessh_enabled | default(false) | bool

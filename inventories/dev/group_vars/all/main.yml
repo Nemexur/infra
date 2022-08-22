@@ -1,0 +1,49 @@
+---
+#
+# Enabling goes here
+#
+vpn_enabled: true
+nvidia_docker_enabled: false
+nas_stuff_enabled: false
+samba_enabled: true
+traefik_enabled: true
+traefik_internal_enabled: true
+vpn_docker_network_enabled: false
+dashboard_enabled: true
+smart_monitoring_enabled: false
+security_enabled: false
+endlessh_enabled: false
+powersaving_enabled: false
+#
+# Misc
+#
+username: admin
+password: admin
+email: admin@admin
+fetch_files_dir: "{{ playbook_dir }}/files/fetch/dev"
+locale: en_US.UTF-8
+guid: "1313"
+timezone: Europe/Moscow
+ntp_timezone: "{{ timezone }}"
+host_local: internal.localhost
+default_owner:
+  name: root
+  id: "0"
+default_group:
+  name: users
+  id: "100"
+go_arch_map:
+  i386: "386"
+  x86_64: "amd64"
+  aarch64: "arm64"
+  armv7l: "armv7"
+  armv6l: "armv6"
+go_arch: "{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}"
+#
+# geerlingguy.security
+#
+security_ssh_port: 69
+security_sudoers_passwordless: ["{{ username }}"]
+security_autoupdate_reboot: true
+security_autoupdate_mail_to: "{{ email }}"
+security_autoupdate_mail_on_error: true

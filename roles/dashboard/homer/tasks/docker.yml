@@ -1,0 +1,29 @@
+---
+- name: Generate homer config file
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: "{{ docker_dir }}/{{ container_name }}/theme/assets/config.yml"
+    mode: 0644
+    owner: "{{ guid }}"
+    group: "{{ default_group.name }}"
+  register: homer_config
+
+- name: "Ensure {{ container_name }} container is up and running"
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    state: started
+    restart_policy: unless-stopped
+    image: "{{ container_image }}"
+    networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    env:
+      TZ: "{{ timezone }}"
+    user: "{{ guid }}:{{ default_group.id }}"
+    volumes:
+      - "{{ docker_dir }}/{{ container_name }}/theme/assets:/www/assets"
+      - "{{ docker_dir }}/{{ container_name }}/tools:/www/assets/tools:z"
+    labels: "{{ container_labels }}"
+    recreate: "{{ homer_config is changed }}"

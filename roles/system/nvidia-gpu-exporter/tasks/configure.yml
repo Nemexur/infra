@@ -1,0 +1,16 @@
+---
+- name: Generate nvidia_gpu_exporter systemd service file
+  ansible.builtin.template:
+    src: nvidia_gpu_exporter.service.j2
+    dest: /etc/systemd/system/nvidia_gpu_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart nvidia_gpu_exporter
+
+- name: Ensure nvidia_gpu_exporter is started and enabled on boot
+  ansible.builtin.systemd:
+    name: nvidia_gpu_exporter
+    state: started
+    enabled: true
+    daemon_reload: true

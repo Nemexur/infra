@@ -1,0 +1,45 @@
+---
+- name: Ensure required directories are present
+  ansible.builtin.file:
+    dest: "{{ item.dest | default(item) }}"
+    state: directory
+    mode: 0775
+    owner: "{{ item.owner | default(default_owner.name) }}"
+    group: "{{ item.group | default(default_group.name) }}"
+  loop:
+    - dest: "{{ docker_dir }}/{{ container_name }}"
+      owner: "{{ guid }}"
+    - dest: "{{ docker_dir }}/{{ container_name }}/config"
+      owner: "{{ guid }}"
+    - dest: "{{ docker_dir }}/{{ container_name }}/watch"
+      owner: "{{ guid }}"
+    - "{{ mergerfs_root }}/Downloads/Movies"
+    - "{{ mergerfs_root }}/Downloads/Books"
+    - "{{ mergerfs_root }}/Downloads/TV"
+
+- name: "Ensure {{ container_name }} container is up and running"
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    state: started
+    restart_policy: unless-stopped
+    image: "{{ container_image }}"
+    networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    env:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+    ports:
+      - 51413:51413
+      - 51413:51413/udp
+    volumes:
+      - "{{ docker_dir }}/{{ container_name }}/config:/config"
+      - "{{ docker_dir }}/{{ container_name }}/watch:/watch"
+      - "{{ mergerfs_root }}/Downloads/TV:/data/torrents/tv"
+      - "{{ mergerfs_root }}/Downloads/Books:/data/torrents/books"
+      - "{{ mergerfs_root }}/Downloads/Movies:/data/torrents/movies"
+      - /etc/localtime:/etc/localtime:ro
+    labels: "{{ container_labels }}"

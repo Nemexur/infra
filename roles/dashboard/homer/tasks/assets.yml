@@ -1,0 +1,44 @@
+---
+- name: Ensure required directories are present
+  ansible.builtin.file:
+    dest: "{{ item.dest | default(item) }}"
+    state: directory
+    mode: 0775
+    owner: "{{ guid }}"
+    group: "{{ default_group.name }}"
+  loop:
+    - "{{ docker_dir }}/{{ container_name }}"
+
+- name: Ensure homer-icons folder is present
+  ansible.builtin.file:
+    path: "{{ docker_dir }}/{{ container_name }}/tools/homer-icons"
+    state: directory
+    mode: 0755
+    owner: "{{ guid }}"
+    group: "{{ default_group.name }}"
+
+- name: List the apps with icons
+  ansible.builtin.set_fact:
+    apps_with_icons: "{{ apps_with_icons | default([]) + [(item.logo | basename).split('.')[0]] }}"
+  loop: "{{ web_applications + (homer_external_applications | default([])) }}"
+
+- name: Clone {{ homer_theme_repo }} theme repo
+  ansible.builtin.git:
+    repo: "https://github.com/{{ homer_theme_repo }}.git"
+    dest: "{{ docker_dir }}/{{ container_name }}/theme"
+    version: "{{ homer_theme_version }}"
+    single_branch: true
+    update: false
+
+- name: Copy the icons
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ docker_dir }}/{{ container_name }}/tools/homer-icons/{{ item | basename }}"
+    mode: 0755
+    owner: "{{ guid }}"
+    group: "{{ default_group.name }}"
+  when: >-
+    (item | basename).split('.')[0] in apps_with_icons
+    or (item | basename).split('.')[0] == "logo"
+  with_fileglob:
+    - files/icons/*.png
