@@ -90,8 +90,9 @@ All of the values in hierarchy below are tags (**lowercased**) in [main.yml](mai
 ## Special thanks
 
 - [Wolfgang](https://github.com/notthebee) for his [Infra](https://github.com/notthebee/infra) project. I was inspired by this project and "borrowed" a lot of ideas.
-- David Stephens for his [Ansible NAS](https://github.com/davestephens/ansible-nas) project. Traefik setup and dockerized applications helped me a lot.
-- Larry Smith Jr. did an amazing job with [Ansible ZFS role](https://github.com/mrlesmithjr/ansible-zfs).
+- [David Stephens](https://github.com/davestephens) for his [Ansible NAS](https://github.com/davestephens/ansible-nas) project. Traefik setup and dockerized applications helped me a lot.
+- [Larry Smith Jr.](https://github.com/mrlesmithjr) did an amazing job with [Ansible ZFS role](https://github.com/mrlesmithjr/ansible-zfs).
+- [Jeff Geerling](https://github.com/geerlingguy) for his book [Ansible for DevOps](https://www.ansiblefordevops.com/). One of the best books I read in 2022.
 
 ## TODO
 
