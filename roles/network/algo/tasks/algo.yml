@@ -23,10 +23,39 @@
     single_branch: true
     update: false
 
-- name: Copy configuration file for algo-vpn
+# NOTE: Alternatively you can use envvar
+- name: Check stats of configuration file for algo-vpn
+  ansible.builtin.stat:
+    path: "{{ algo_install_path }}/tmp/config.cfg"
+  register: _algo_vpn_config
+
+- name: Setup configuration file for algo-vpn
+  when: not _algo_vpn_config.stat.exists
+  block:
+    - name: Ensure tmp directory is present
+      ansible.builtin.file:
+        path: "{{ algo_install_path }}/tmp"
+        state: directory
+        mode: 0644
+
+    - name: Copy configuration file
+      ansible.builtin.copy:
+        src: config.cfg
+        dest: "{{ algo_install_path }}/tmp/config.cfg"
+        mode: 0644
+
+    - name: Set Pi-Hole server address
+      ansible.builtin.lineinfile:
+        path: "{{ algo_install_path }}/tmp/config.cfg"
+        regexp: "Pi-HoleServer"
+        line: "    - {{ groups['home'] | first }}"
+        mode: 0644
+
+- name: Update default configuration file
   ansible.builtin.copy:
-    src: config.cfg
+    src: "{{ algo_install_path }}/tmp/config.cfg"
     dest: "{{ algo_install_path }}/config.cfg"
+    remote_src: true
     mode: 0644
 
 - name: Copy install file for algo-vpn
