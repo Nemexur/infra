@@ -16,15 +16,6 @@
     - role: geerlingguy.ntp
       ansible_os_family: "{{ ansible_facts['os_family'] }}"
 
-- name: Setup VPN to local network
-  hosts: vpn
-  become: true
-
-  roles:
-    - role: network/algo
-      tags: vpn
-      when: vpn_enabled | default(false) | bool
-
 - name: Setup home-server
   hosts: home
   become: true
@@ -204,6 +195,15 @@
         - smart
         - monitoring
       when: smart_monitoring_enabled | default(false) | bool
+
+- name: Setup VPN to local network
+  hosts: vpn
+  become: true
+
+  roles:
+    - role: network/algo
+      tags: vpn
+      when: vpn_enabled | default(false) | bool
 
 - name: Setup metric exporters
   hosts: exporters
