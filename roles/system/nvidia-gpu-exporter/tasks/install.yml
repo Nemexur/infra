@@ -22,7 +22,7 @@
     creates: "/tmp/nvidia_gpu_exporter"
   check_mode: false
 
-- name: Propagate node_exporter binaries
+- name: Propagate nvidia_gpu_exporter binaries
   ansible.builtin.copy:
     src: "/tmp/nvidia_gpu_exporter"
     dest: "{{ nvidia_gpu_exporter_binary_install_dir }}/nvidia_gpu_exporter"
