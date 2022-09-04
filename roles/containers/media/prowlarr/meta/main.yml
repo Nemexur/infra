@@ -1,0 +1,19 @@
+---
+dependencies:
+  - role: core/container
+    container_name: prowlarr
+    container_image: lscr.io/linuxserver/prowlarr:develop
+    container_network_mode: "{{ vpn_docker_network }}"
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/config"
+      - "/etc/localtime:/etc/localtime:ro"
+    container_labels:
+      traefik.http.routers.prowlarr.rule: Host(`{{ url }}`)
+      traefik.http.services.prowlarr.loadbalancer.server.port: "9696"

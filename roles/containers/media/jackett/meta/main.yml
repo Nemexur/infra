@@ -1,0 +1,21 @@
+---
+dependencies:
+  - role: core/container
+    container_name: jackett
+    container_image: lscr.io/linuxserver/jackett:latest
+    container_network_mode: "{{ vpn_docker_network }}"
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+    container_sysctls:
+      net.ipv6.conf.all.disable_ipv6: 1
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/config"
+      - "/etc/localtime:/etc/localtime:ro"
+    container_labels:
+      traefik.http.routers.jackett.rule: Host(`{{ url }}`)
+      traefik.http.services.jackett.loadbalancer.server.port: "9117"

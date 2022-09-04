@@ -1,0 +1,25 @@
+---
+- name: "Ensure required directories are present for {{ container_name }}"
+  ansible.builtin.file:
+    dest: "{{ item.dest | default(item) }}"
+    state: directory
+    mode: 0775
+    owner: "{{ item.owner | default(default_owner.name) }}"
+    group: "{{ item.group | default(default_group.name) }}"
+  loop: "{{ container_directories }}"
+
+- name: Ensure {{ container_name }} container is up and running
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    state: "{{ container_state | default('started') }}"
+    restart_policy: "{{ container_restart_policy | default('unless-stopped') }}"
+    image: "{{ container_image }}"
+    privileged: "{{ container_privileged | default('false') | bool }}"
+    network_mode: "{{ container_network_mode | default('default') }}"
+    networks: "{{ container_networks }}"
+    env: "{{ container_envs }}"
+    ports: "{{ container_ports }}"
+    devices: "{{ container_devices }}"
+    sysctls: "{{ container_sysctls }}"
+    volumes: "{{ container_volumes }}"
+    labels: "{{ container_labels }}"

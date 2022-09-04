@@ -5,9 +5,3 @@ ipv4_address: "{{ traefik_internal_network_base }}.23"
 dashboard_name: Deluge
 homer_category: services
 homer_subtitle: Lightweight BitTorrent client with OpenVPN
-
-container_name: deluge
-container_image: lscr.io/linuxserver/deluge:latest
-container_labels:
-  traefik.http.routers.deluge.rule: Host(`{{ url }}`)
-  traefik.http.services.deluge.loadbalancer.server.port: "8112"

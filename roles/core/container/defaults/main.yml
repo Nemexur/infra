@@ -1,0 +1,11 @@
+---
+container_directories: []
+container_privileged: false
+container_network_mode: default
+container_networks: []
+container_envs: {}
+container_ports: []
+container_devices: []
+container_sysctls: {}
+container_volumes: []
+container_labels: {}

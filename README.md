@@ -98,7 +98,7 @@ All of the values in hierarchy below are tags (**lowercased**) in [main.yml](mai
 
 ### Major
 
-- [ ] Create universal role to run docker containers
+- [x] Create universal role to run docker containers
 - [ ] Create a new role to manage users and groups
 - [ ] Add role to deploy dashy
 - [ ] Better filesystem management

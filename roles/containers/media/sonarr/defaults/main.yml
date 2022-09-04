@@ -5,9 +5,3 @@ ipv4_address: "{{ traefik_internal_network_base }}.17"
 dashboard_name: Sonarr
 homer_category: media
 homer_subtitle: Automatically monitor multiple RSS feeds for tv shows
-
-container_name: sonarr
-container_image: lscr.io/linuxserver/sonarr:latest
-container_labels:
-  traefik.http.routers.sonarr.rule: Host(`{{ url }}`)
-  traefik.http.services.sonarr.loadbalancer.server.port: "8989"

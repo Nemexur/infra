@@ -5,9 +5,3 @@ ipv4_address: "{{ traefik_internal_network_base }}.16"
 dashboard_name: Readarr
 homer_category: media
 homer_subtitle: Automatically monitor multiple RSS feeds for books
-
-container_name: readarr
-container_image: lscr.io/linuxserver/readarr:develop
-container_labels:
-  traefik.http.routers.readarr.rule: Host(`{{ url }}`)
-  traefik.http.services.readarr.loadbalancer.server.port: "8787"

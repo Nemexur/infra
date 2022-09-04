@@ -1,15 +1,4 @@
 ---
-- name: Ensure required directories are present
-  ansible.builtin.file:
-    dest: "{{ item.dest | default(item) }}"
-    state: directory
-    mode: 0775
-    owner: "{{ item.owner | default(default_owner.name) }}"
-    group: "{{ item.group | default(default_group.name) }}"
-  loop:
-    - dest: "{{ docker_dir }}/{{ container_name }}"
-      owner: "{{ guid }}"
-
 - name: Ensure flaresolverr is up and running
   community.docker.docker_container:
     name: flaresolverr
@@ -24,26 +13,3 @@
       LOG_HTML: "false"
       CAPTCHA_SOLVER: none
       TZ: "{{ timezone }}"
-
-- name: Ensure {{ container_name }} container is up and running
-  community.docker.docker_container:
-    name: "{{ container_name }}"
-    state: started
-    restart_policy: unless-stopped
-    image: "{{ container_image }}"
-    network_mode: "{{ vpn_docker_network }}"
-    networks:
-      - name: "{{ traefik_internal_network_name }}"
-        ipv4_address: "{{ ipv4_address }}"
-        aliases:
-          - "{{ container_name }}"
-    env:
-      PUID: "{{ guid }}"
-      PGID: "{{ default_group.id }}"
-      TZ: "{{ timezone }}"
-    sysctls:
-      net.ipv6.conf.all.disable_ipv6: 1
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "{{ docker_dir }}/{{ container_name }}:/config"
-    labels: "{{ container_labels }}"

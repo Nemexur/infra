@@ -1,0 +1,23 @@
+---
+dependencies:
+  - role: core/container
+    container_name: sonarr
+    container_image: lscr.io/linuxserver/sonarr:latest
+    container_network_mode: "{{ vpn_docker_network }}"
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+      - "{{ mergerfs_root }}/Media/TV"
+      - "{{ mergerfs_root }}/Downloads/TV"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/config"
+      - "{{ mergerfs_root }}/Media/TV:/data/media/tv"
+      - "{{ mergerfs_root }}/Downloads/TV:/data/torrents/tv"
+      - /etc/localtime:/etc/localtime:ro
+    container_labels:
+      traefik.http.routers.sonarr.rule: Host(`{{ url }}`)
+      traefik.http.services.sonarr.loadbalancer.server.port: "8989"
