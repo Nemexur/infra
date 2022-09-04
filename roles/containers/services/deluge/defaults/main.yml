@@ -3,5 +3,5 @@ url: "deluge.{{ host_local }}"
 ipv4_address: "{{ traefik_internal_network_base }}.23"
 
 dashboard_name: Deluge
-homer_category: services
-homer_subtitle: Lightweight BitTorrent client with OpenVPN
+dashboard_category: services
+dashboard_subtitle: Lightweight BitTorrent client with OpenVPN

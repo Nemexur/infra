@@ -32,6 +32,6 @@
       [{'logo': 'assets/tools/homer-icons/' + item.path.split('/')[-1] + '.png',
       'name': lookup('vars', item.path.split('/')[-1])['dashboard_name'] | default(item.path.split('/')[-1] | title),
       'url' : 'http://' + (lookup('vars', item.path.split('/')[-1])['url'] | default('')),
-      'subtitle' : lookup('vars', item.path.split('/')[-1])['homer_subtitle'] | default(''),
-      'category': lookup('vars', item.path.split('/')[-1])['homer_category'] | default ('')}] }}
+      'subtitle' : lookup('vars', item.path.split('/')[-1])['dashboard_subtitle'] | default(''),
+      'category': lookup('vars', item.path.split('/')[-1])['dashboard_category'] | default ('')}] }}
   loop: "{{ infra_containers.files }}"

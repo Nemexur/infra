@@ -4,8 +4,8 @@ pihole_password: admin
 pihole_web_port: "80"
 
 dashboard_name: Pi-hole
-homer_category: services
-homer_subtitle: DNS sinkhole to protect your devices
+dashboard_category: services
+dashboard_subtitle: DNS sinkhole to protect your devices
 
 container_name: pihole
 container_image: cbcrowe/pihole-unbound:latest

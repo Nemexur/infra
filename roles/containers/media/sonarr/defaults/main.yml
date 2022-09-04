@@ -3,5 +3,5 @@ url: "sonarr.{{ host_local }}"
 ipv4_address: "{{ traefik_internal_network_base }}.17"
 
 dashboard_name: Sonarr
-homer_category: media
-homer_subtitle: Automatically monitor multiple RSS feeds for tv shows
+dashboard_category: media
+dashboard_subtitle: Automatically monitor multiple RSS feeds for tv shows

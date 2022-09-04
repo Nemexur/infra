@@ -136,7 +136,7 @@ pihole_web_port: "1234"
 # dashboard/homer
 #
 homer_title: Well, he's very dear to my heart.
-homer_subtitle: You don't remember anything, do you?
+dashboard_subtitle: You don't remember anything, do you?
 homer_external_applications:
   - name: Grafana
     url: "http://grafana.{{ host_local }}"

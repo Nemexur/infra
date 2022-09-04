@@ -3,5 +3,5 @@ url: "radarr.{{ host_local }}"
 ipv4_address: "{{ traefik_internal_network_base }}.15"
 
 dashboard_name: Radarr
-homer_category: media
-homer_subtitle: Automatically monitor multiple RSS feeds for movies
+dashboard_category: media
+dashboard_subtitle: Automatically monitor multiple RSS feeds for movies

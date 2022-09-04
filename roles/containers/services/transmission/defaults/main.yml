@@ -3,5 +3,5 @@ url: "transmission.{{ host_local }}"
 ipv4_address: "{{ traefik_internal_network_base }}.18"
 
 dashboard_name: Transmission
-homer_category: services
-homer_subtitle: Cross-platform BitTorrent client
+dashboard_category: services
+dashboard_subtitle: Cross-platform BitTorrent client

@@ -3,5 +3,5 @@ url: "jackett.{{ host_local }}"
 ipv4_address: "{{ traefik_internal_network_base }}.11"
 
 dashboard_name: Jackett
-homer_category: media
-homer_subtitle: Tracker-site-specific http queries
+dashboard_category: media
+dashboard_subtitle: Tracker-site-specific http queries

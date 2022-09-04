@@ -5,8 +5,8 @@ ipv4_address: "{{ traefik_internal_network_base }}.22"
 traefik_web_port: "80"
 
 dashboard_name: Traefik
-homer_category: system
-homer_subtitle: Networking Stack That Just Works
+dashboard_category: system
+dashboard_subtitle: Networking Stack That Just Works
 
 container_name: traefik
 container_image: traefik:v2.8

@@ -3,5 +3,5 @@ url: "prowlarr.{{ host_local }}"
 ipv4_address: "{{ traefik_internal_network_base }}.14"
 
 dashboard_name: Prowlarr
-homer_category: media
-homer_subtitle: Integrate with your various PVR apps
+dashboard_category: media
+dashboard_subtitle: Integrate with your various PVR apps

@@ -3,5 +3,5 @@ url: "readarr.{{ host_local }}"
 ipv4_address: "{{ traefik_internal_network_base }}.16"
 
 dashboard_name: Readarr
-homer_category: media
-homer_subtitle: Automatically monitor multiple RSS feeds for books
+dashboard_category: media
+dashboard_subtitle: Automatically monitor multiple RSS feeds for books

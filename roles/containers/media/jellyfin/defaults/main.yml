@@ -3,8 +3,8 @@ url: "jellyfin.{{ host_local }}"
 ipv4_address: "{{ traefik_internal_network_base }}.12"
 
 dashboard_name: Jellyfin
-homer_category: media
-homer_subtitle: Free Software Media System
+dashboard_category: media
+dashboard_subtitle: Free Software Media System
 
 container_name: jellyfin
 container_image: lscr.io/linuxserver/jellyfin:latest
