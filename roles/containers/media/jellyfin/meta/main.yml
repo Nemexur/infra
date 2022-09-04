@@ -16,7 +16,7 @@ dependencies:
         ipv4_address: "{{ ipv4_address }}"
         aliases:
           - "{{ container_name }}"
-    container_runtime: "{{ nvidia_docker_enabled | default(false) | bool | ternary('nvidia', '') }}"
+    container_runtime: "{{ nvidia_docker_enabled | default(false) | bool | ternary('nvidia', 'runc') }}"
     container_envs:
       PUID: "{{ guid }}"
       PGID: "{{ default_group.id }}"

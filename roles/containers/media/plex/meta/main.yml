@@ -9,7 +9,7 @@ dependencies:
       - "{{ mergerfs_root }}/Media/Movies"
       - "{{ mergerfs_root }}/Media/TV"
     container_network_mode: host
-    container_runtime: "{{ nvidia_docker_enabled | default(false) | bool | ternary('nvidia', '') }}"
+    container_runtime: "{{ nvidia_docker_enabled | default(false) | bool | ternary('nvidia', 'runc') }}"
     container_envs:
       PUID: "{{ guid }}"
       PGID: "{{ default_group.id }}"
