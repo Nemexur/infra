@@ -1,0 +1,8 @@
+---
+dependencies:
+  - role: core/container
+    container_name: watchtower
+    container_image: containrrr/watchtower
+    container_command: "{{ watchtower_command }}"
+    container_volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

@@ -1,6 +1,8 @@
 ---
 container_directories: []
+container_pull: true
 container_privileged: false
+container_command: ""
 container_network_mode: default
 container_networks: []
 container_envs: {}
