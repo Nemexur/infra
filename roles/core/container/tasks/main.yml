@@ -8,7 +8,7 @@
     group: "{{ item.group | default(default_group.name) }}"
   loop: "{{ container_directories }}"
 
-- name: Ensure {{ container_name }} container is up and running
+- name: "Ensure {{ container_name }} container is up and running"
   community.docker.docker_container:
     name: "{{ container_name }}"
     state: "{{ container_state | default('started') }}"
@@ -19,6 +19,7 @@
     networks: "{{ container_networks }}"
     env: "{{ container_envs }}"
     ports: "{{ container_ports }}"
+    runtime: "{{ container_runtime }}"
     devices: "{{ container_devices }}"
     sysctls: "{{ container_sysctls }}"
     volumes: "{{ container_volumes }}"

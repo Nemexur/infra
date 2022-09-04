@@ -19,7 +19,7 @@ repos:
     hooks:
       - id: yamllint
   - repo: https://github.com/ansible/ansible-lint.git
-    rev: v6.4.0
+    rev: v6.5.2
     hooks:
       - id: ansible-lint
         args: [--offline]

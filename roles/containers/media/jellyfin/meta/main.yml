@@ -1,0 +1,41 @@
+---
+dependencies:
+  - role: core/container
+    container_name: jellyfin
+    container_image: lscr.io/linuxserver/jellyfin:latest
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+      - "{{ mergerfs_root }}/Media/Movies"
+      - "{{ mergerfs_root }}/Media/TV"
+      - "{{ mergerfs_root }}/Media/Metadata"
+      - "{{ mergerfs_root }}/Media/Cache"
+      - "{{ mergerfs_root }}/Media/Transcodes"
+    container_networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    container_runtime: "{{ nvidia_docker_enabled | default(false) | bool | ternary('nvidia', '') }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+      VERSION: latest
+      NVIDIA_VISIBLE_DEVICES: all
+    container_ports:
+      - 7359:7359/udp
+      - 1900:1900/udp
+    container_devices:
+      - /dev/dri:/dev/dri
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/config"
+      - "{{ mergerfs_root }}/Media/movies:/movies"
+      - "{{ mergerfs_root }}/Media/TV:/tv"
+      - "{{ mergerfs_root }}/Media/Metadata:/metadata"
+      - "{{ mergerfs_root }}/Media/Cache:/data/Cache"
+      - "{{ mergerfs_root }}/Media/Transcodes:/config/data/transcodes"
+      - /etc/localtime:/etc/localtime:ro
+    container_labels:
+      traefik.http.routers.jellyfin.rule: Host(`{{ url }}`)
+      traefik.http.services.jellyfin.loadbalancer.server.port: "8096"
