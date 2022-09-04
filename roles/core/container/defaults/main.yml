@@ -5,7 +5,7 @@ container_network_mode: default
 container_networks: []
 container_envs: {}
 container_ports: []
-container_runtime: ""
+container_runtime: runc
 container_devices: []
 container_sysctls: {}
 container_volumes: []
