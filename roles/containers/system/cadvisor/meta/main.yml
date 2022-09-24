@@ -9,6 +9,8 @@ dependencies:
         ipv4_address: "{{ ipv4_address }}"
         aliases:
           - "{{ container_name }}"
+    container_ports:
+      - 8081:8080/tcp
     container_envs:
       TZ: "{{ timezone }}"
     container_devices:
