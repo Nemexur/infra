@@ -10,6 +10,7 @@ dependencies:
         owner: "{{ guid }}"
       - dest: "{{ docker_dir }}/{{ container_name }}/watch"
         owner: "{{ guid }}"
+      - "{{ mergerfs_root }}/Downloads/Stuff"
       - "{{ mergerfs_root }}/Downloads/Movies"
       - "{{ mergerfs_root }}/Downloads/Books"
       - "{{ mergerfs_root }}/Downloads/TV"
@@ -31,6 +32,7 @@ dependencies:
       - "{{ mergerfs_root }}/Downloads/TV:/data/torrents/tv"
       - "{{ mergerfs_root }}/Downloads/Books:/data/torrents/books"
       - "{{ mergerfs_root }}/Downloads/Movies:/data/torrents/movies"
+      - "{{ mergerfs_root }}/Downloads/Stuff:/data/torrents/stuff"
       - /etc/localtime:/etc/localtime:ro
     container_labels:
       traefik.http.routers.transmission.rule: Host(`{{ url }}`)
