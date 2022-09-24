@@ -14,6 +14,7 @@ dependencies:
       - "{{ mergerfs_root }}/Downloads/Movies"
       - "{{ mergerfs_root }}/Downloads/Books"
       - "{{ mergerfs_root }}/Downloads/TV"
+      - "{{ mergerfs_root }}/Downloads/Incomplete"
     container_networks:
       - name: "{{ traefik_internal_network_name }}"
         ipv4_address: "{{ ipv4_address }}"
@@ -33,6 +34,7 @@ dependencies:
       - "{{ mergerfs_root }}/Downloads/Books:/data/torrents/books"
       - "{{ mergerfs_root }}/Downloads/Movies:/data/torrents/movies"
       - "{{ mergerfs_root }}/Downloads/Stuff:/data/torrents/stuff"
+      - "{{ mergerfs_root }}/Downloads/Incomplete:/downloads/incomplete"
       - /etc/localtime:/etc/localtime:ro
     container_labels:
       traefik.http.routers.transmission.rule: Host(`{{ url }}`)
