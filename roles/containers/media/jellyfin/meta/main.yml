@@ -30,7 +30,7 @@ dependencies:
       - /dev/dri:/dev/dri
     container_volumes:
       - "{{ docker_dir }}/{{ container_name }}:/config"
-      - "{{ mergerfs_root }}/Media/movies:/movies"
+      - "{{ mergerfs_root }}/Media/Movies:/movies"
       - "{{ mergerfs_root }}/Media/TV:/tv"
       - "{{ mergerfs_root }}/Media/Metadata:/metadata"
       - "{{ mergerfs_root }}/Media/Cache:/data/Cache"
