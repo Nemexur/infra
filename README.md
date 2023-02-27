@@ -18,30 +18,34 @@ Also this project helped me to learn a lot about:
 - Docker Networking
 - DHCP and DNS servers
 - Security
-- SSL certificates
+- Firewall
+- VPN
+- TLS certificates
 - Cloudflare
 - S.M.A.R.T
 - Filesystem
 
 ## Description
 
-The playbook is mostly being developed for personal use. It assumes my home setup of 3 Ubuntu-based servers:
+The playbook is mostly being developed for personal use. It assumes my home setup of 2 **Fedora**-based servers (37 Server):
 
 - `Home` - main server with the cool stuff.
-- `VPN` - access to my home network from elsewhere.
-- `Monitoring` - where to store metrics and logs.
+- `Monitoring` - where to store metrics and logs + networking part.
+
+Everything is deployed as docker containers.
 
 ### Plans
 
-After a while I will merge `VPN` and `Monitoring` servers.
+- Add Authelia to public services
+- Use K8s ([k3s](https://k3s.io/)) to manage apps and simplify nodes management
 
 ### Applications
 
-All of the values in hierarchy below are tags (**lowercased**) in [main.yml](main.yml). Highlighted words indicate servers the tag is being used with.
+All of the values in hierarchy below are tags (**lowercased**) in [main.yml](main.yml). Highlighted words indicate servers the tag is being used with. There are probably some mistakes in the structure below.
 
-- [VPN](https://github.com/trailofbits/algo) - setup Algo VPN server `VPN`.
-- Essential - essential setup like users, groups and powersaving `Home`.
-  - Packages - install apt packages.
+- [VPN](https://github.com/WeeJeWel/wg-easy) - setup WireGuard Easy container `Monitoring`.
+- Essential - essential setup like users, groups and powersaving `Home/Monitoring`.
+  - Packages - install dnf packages.
 - Filesystem - setup filesystem for home server `Home`.
   - [ZFS](https://zfsonlinux.org/) - setup pool and filesystem from SATA disks.
   - [MergerFS](https://github.com/trapexit/mergerfs) - merge separate disks and pools together.
@@ -50,13 +54,14 @@ All of the values in hierarchy below are tags (**lowercased**) in [main.yml](mai
 - [Docker](https://www.docker.com/) - install and enable docker (optionally nvidia-docker).
 - Apps - available applications in the system `Home`.
   - Network - setup and enable everything related to network.
-    - [Traefik](https://traefik.io/) - web proxy and SSL certificate manager.
+    - [Traefik](https://traefik.io/) - web proxy and TLS certificates manager.
     - [OpenVPN](https://openvpn.net/) - containerized OpenVPN client.
   - Containers - docker containers connected with traefik network.
     - Containers/System - everything that helps me to monitor and control my Home server.
       - [cAdvisor](https://github.com/google/cadvisor) - analyzes resource usage and performance characteristics of running containers.
       - [Watchtower](https://github.com/v2tec/watchtower) - monitor your Docker containers and update them if a new version is available.
       - [Portainer](https://portainer.io/) - easily manage Docker and running containers.
+      - [Diun](https://crazymax.dev/diun/) - receive notifications when a Docker image is updated on a Docker registry.
     - Containers/Media - everything to consume my media.
       - [Bazarr](https://github.com/morpheus65535/bazarr) - companion to Radarr and Sonarr for downloading subtitles.
       - [Jackett](https://github.com/Jackett/Jackett) - API Support for your favorite torrent trackers.
@@ -74,18 +79,13 @@ All of the values in hierarchy below are tags (**lowercased**) in [main.yml](mai
     - [Homer](https://github.com/bastienwirtz/homer) - a very simple static homepage for your server.
 - Monitoring - more metrics is always better.
   - [SMART](https://www.smartmontools.org/) - S.M.A.R.T monitoring of SATA disks `Home`.
-  - Exporters - setup and enable metrics exporters for [Prometheus](https://prometheus.io/) `Home/VPN/Monitoring`.
+  - Exporters - setup and enable metrics exporters for [Prometheus](https://prometheus.io/) `Home/Monitoring`.
     - [Node](https://github.com/prometheus/node_exporter) - exporter for hardware and OS metrics.
     - [Nvidia](https://github.com/utkuozdemir/nvidia_gpu_exporter) - Nvidia GPU exporter for prometheus, using nvidia-smi binary to gather metrics.
   - [Prometheus](https://prometheus.io/) - an open-source systems monitoring and alerting toolkit `Monitoring`.
   - [Grafana](https://grafana.com/) - an open source analytics & monitoring solution for every database `Monitoring`.
-- [Security](https://github.com/geerlingguy/ansible-role-security) - security measures for my servers `Home/VPN/Monitoring`.
+- [Security](https://github.com/geerlingguy/ansible-role-security) - security measures for my servers `Home/Monitoring`.
   - [Security/Endlessh](https://github.com/skeeto/endlessh) - SSH tarpit that slowly sends an endless banner.
-
-### Notes
-
-- If nvidia-docker does not work, you probably need to disable `cgroup_hierarchy`. It happens in Pop!_OS based system: `sudo kernelstub -a systemd.unified_cgroup_hierarchy=0`.
-- Do not forget to change actions in zfs_pools.
 
 ## Special thanks
 
@@ -98,20 +98,25 @@ All of the values in hierarchy below are tags (**lowercased**) in [main.yml](mai
 
 ### Major
 
+- [ ] Refactor inventories/dev
 - [x] Create universal role to run docker containers
-- [ ] Create a new role to manage users and groups
-- [ ] Add role to deploy dashy
-- [ ] Better filesystem management
-- [ ] Add public network management with SWAG or Traefik
+- [x] Create a new role to manage users and groups
+- [x] Better filesystem management
+- [ ] Add public network management with Traefik
 - [ ] Add Cloudflare integration for public network
+- [ ] Support Authelia
+- [ ] Add k3s to experimental + create new inventory for it
 
 ### Misc
 
 - [ ] Refactor dashboard/homer
-- [ ] Refactor enabling management
-- [ ] Exclude open-vpn from cron docker backup
+- [x] Refactor enabling management
+- [x] Exclude open-vpn from cron docker backup
 - [ ] Better project structure
-- [ ] Refactor grafana dashboards management (templating)
+- [x] Refactor grafana dashboards management (templating)
+- [ ] Rename home -> alice, monitoring -> bravo
+- [ ] yml -> yaml
+- [ ] Support telegram notifications
 
 ### Useful
 
