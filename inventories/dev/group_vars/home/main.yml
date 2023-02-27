@@ -1,36 +1,43 @@
 ---
 #
+# Enabling goes here
+#
+docker_backup_enabled: true
+#
 # Misc
 #
 docker_dir: /opt/docker/data
 hostname: "{{ inventory_hostname }}"
-github_token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+github_token: "{{ lookup('env', 'github_token') }}"
 ssh_public_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 vpn_docker_network: "{{ vpn_docker_network_enabled | ternary('container:open-vpn', 'default') }}"
 #
 # system/users
 #
-home_system_users:
+sambashare_group_name: sambashare
+system_users:
   - name: "{{ username }}"
     password: "{{ password | password_hash('sha512', 'ansible') }}"
     groups:
       - users
+      - sambashare
       - "{{ sudo_group }}"
     append: true
   - name: dockeruser
     uid: "{{ guid | int }}"
     groups:
       - users
+      - sambashare
       - "{{ sudo_group }}"
     append: true
-sambashare_group_name: sambashare
-sambashare_gid: 1003
+  - name: "{{ sambashare_group_name }}"
+    gid: 1003
+    groups:
+      - "{{ sambashare_group_name }}"
 #
-# Packages
+# system/packages
 #
-system_extra_packages:
-  - iperf3
-  - speedtest-cli
+system_packages:
   - htop
   - stow
   - git
@@ -39,31 +46,34 @@ system_extra_packages:
   - tmux
   - mosh
   - rsync
-  - lm-sensors
   - iotop
   - ncdu
+  - cronie
   - hddtemp
-  - mergerfs
-system_python_packages:
-  - python3.9
-  - python3.9-dev
-  - python3.9-venv
+  - initscripts
+  - samba
+  - python3.10
+  - python3.11
   - python3-pip
+  - dnf-plugins-core
+  - ca-certificates
+  - curl
+  # Urls
+  - name: https://github.com/trapexit/mergerfs/releases/download/2.33.5/mergerfs-2.33.5-1.fc32.x86_64.rpm
+    disable_gpg_check: true
+  - name: https://zfsonlinux.org/fedora/zfs-release-2-2.fc37.noarch.rpm
+    disable_gpg_check: true
+  - kernel-devel
+  - zfs
 system_python_pip_packages:
   - docker
+system_modprobe_modules:
+  - zfs
+system_services:
+  - smb
 #
-# geerlingguy.docker
+# docker/engine
 #
-docker_edition: ce
-docker_package: "docker-{{ docker_edition }}"
-docker_package_state: present
-docker_service_state: started
-docker_service_enabled: true
-docker_restart_handler_state: restarted
-docker_install_compose: true
-docker_compose_version: v2.7.0
-docker_compose_arch: x86_64
-docker_compose_path: /usr/local/bin/docker-compose
 docker_users:
   - "{{ username }}"
   - dockeruser
@@ -115,23 +125,40 @@ cron_jobs:
   - name: backup docker dir
     minute: 10
     hour: "*/2"
-    job: >-
-      docker stop $(docker ps -q);
-      rsync -avz --delete --exclude cache {{ docker_dir }} {{ mergerfs_root }}/docker-data;
-      docker start $(docker ps -a -q)
+    job:
+      - !unsafe docker stop $(docker ps --format "{{ .ID }} {{ .Names }}" | awk '$2 != "open-vpn" { print $1 }')
+      - rsync -avz --delete --exclude cache {{ docker_dir }} {{ mergerfs_root }}/docker-data
+      - docker start $(docker ps -a -q)
+#
+# network/security
+#
+security_firewall_rules:
+  - service: samba
+    state: enabled
+    permanent: true
+  - port: 9100/tcp
+    state: enabled
+    permanent: true
+  - port: grafana
+    state: enabled
+    permanent: true
+  - service: prometheus
+    state: enabled
+    permanent: true
+  - rich_rule: rule service name="exporter" audit limit value="1/m" accept
+    state: enabled
+    permanent: true
+security_sebooleans:
+  - samba_enable_home_dirs
+  - samba_export_all_rw
 #
 # network/traefik
 #
-traefik_internal_network_name: traefik_internal_network
+traefik_internal_network_name: traefik-proxy
 traefik_internal_network_subnet: 172.28.0.0/16
 traefik_internal_network_iprange: 172.28.13.0/24
 traefik_internal_network_gateway: 172.28.13.1
 traefik_internal_network_base: "{{ '.'.join(traefik_internal_network_iprange.split('.')[0:3]) }}"
-#
-# containers/system/pihole
-#
-pihole_password: "{{ password }}"
-pihole_web_port: "1234"
 #
 # dashboard/homer
 #
@@ -143,11 +170,3 @@ homer_external_applications:
     logo: assets/tools/homer-icons/grafana.png
     subtitle: Monitoring solution for every database
     category: system
-#
-# Node Exporter
-#
-node_exporter_enabled_collectors:
-  - systemd
-  - network_route
-  - textfile:
-      directory: "/var/lib/node_exporter"

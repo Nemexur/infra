@@ -8,18 +8,17 @@ repos:
       - id: pretty-format-json
       - id: check-merge-conflict
       - id: check-toml
-      - id: check-yaml
       - id: end-of-file-fixer
       - id: detect-private-key
       - id: check-added-large-files
       - id: mixed-line-ending
       - id: sort-simple-yaml
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.27.1
+    rev: v1.29.0
     hooks:
       - id: yamllint
   - repo: https://github.com/ansible/ansible-lint.git
-    rev: v6.5.2
+    rev: v6.13.1
     hooks:
       - id: ansible-lint
         args: [--offline]

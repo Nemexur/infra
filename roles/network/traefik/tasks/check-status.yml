@@ -1,5 +1,5 @@
 ---
-- name: Get infos on the traefik containers
+- name: Get info on the traefik containers
   community.docker.docker_container_info:
     name: "{{ item }}"
   register: traefik_docker_status

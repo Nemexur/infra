@@ -1,0 +1,6 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{{ ansible_managed | comment }}
+# http://prometheus.io/docs/operating/configuration/
+---
+scrape_configs:
+  {{ prometheus_scrape_configs | to_nice_yaml(indent=2) | indent(2, False) }}

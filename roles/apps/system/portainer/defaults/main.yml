@@ -1,0 +1,3 @@
+---
+portainer_http_port: 9000
+portainer_https_port: 9443

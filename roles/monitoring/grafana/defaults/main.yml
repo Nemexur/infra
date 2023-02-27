@@ -1,0 +1,17 @@
+---
+container_name: grafana
+
+grafana_address: "0.0.0.0"
+grafana_port: 3000
+grafana_url: "http://{{ grafana_address }}:{{ grafana_port }}"
+grafana_api_url: "{{ grafana_url }}"
+grafana_instance: "{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}"
+grafana_security:
+  admin_user: admin
+  admin_password: ""
+grafana_use_provisioning: true
+grafana_data_dir: /var/lib/grafana
+grafana_datasources: []
+grafana_dashboards_dir: ""
+grafana_alerting:
+  execute_alerts: true

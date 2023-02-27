@@ -1,0 +1,35 @@
+---
+- name: "Ensure required directories are present for grafana"
+  ansible.builtin.file:
+    dest: "{{ item.dest | default(item) }}"
+    state: directory
+    mode: 0755
+    owner: grafana
+    group: users
+  loop:
+    - "{{ docker_dir }}/{{ container_name }}"
+    - "{{ docker_dir }}/{{ container_name }}/data/dashboards"
+    - "{{ docker_dir }}/{{ container_name }}/data/datasources"
+    - "{{ docker_dir }}/{{ container_name }}/config/dashboards"
+    - "{{ docker_dir }}/{{ container_name }}/config/datasources"
+    - "{{ docker_dir }}/{{ container_name }}/config/provisioning/dashboards"
+    - "{{ docker_dir }}/{{ container_name }}/config/provisioning/datasources"
+
+- name: Generate grafana config
+  ansible.builtin.template:
+    src: grafana.ini.j2
+    dest: "{{ docker_dir }}/{{ container_name }}/config/grafana.ini"
+    mode: 0644
+
+- name: "Ensure container is up and running: grafana"
+  community.general.docker_container:
+    name: "{{ container_name }}"
+    state: started
+    restart_policy: unless-stopped
+    image: grafana/grafana-oss:latest
+    pull: true
+    ports:
+      - 3000:3000/tcp
+    volumes:
+      - "{{ docker_dir }}/{{ container_name }}/data:{{ grafana_data_dir }}"
+      - "{{ docker_dir }}/{{ container_name }}/config:/etc/grafana"

@@ -1,0 +1,25 @@
+---
+dependencies:
+  - role: core/container
+    container_name: readarr
+    container_image: lscr.io/linuxserver/readarr:develop
+    container_network_mode: "{{ vpn_docker_network }}"
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+      - "{{ mergerfs_root }}/Media/Books"
+      - "{{ mergerfs_root }}/Downloads/Books"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/config"
+      - "{{ mergerfs_root }}/Media/Books:/data/media/books"
+      - "{{ mergerfs_root }}/Downloads/Books:/data/torrents/books"
+    container_labels: |
+      {
+        "traefik.enable": "true",
+        "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "8787",
+      }

@@ -1,0 +1,23 @@
+---
+dependencies:
+  - role: core/container
+    container_name: diun
+    container_image: crazymax/diun:latest
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}/data"
+        owner: "{{ guid }}"
+      - dest: "{{ docker_dir }}/{{ container_name }}/config"
+        owner: "{{ guid }}"
+    container_templates:
+      - src: diun.yaml.j2
+        dest: "{{ docker_dir }}/{{ container_name }}/config/diun.yaml"
+    container_envs:
+      TS: "{{ timezone }}"
+      LOG_LEVEL: info
+      LOG_JSON: "false"
+    container_volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "{{ docker_dir }}/{{ container_name }}/data:/data"
+      - "{{ docker_dir }}/{{ container_name }}/config:/etc/diun"
+    container_ssl_enabled: false
+    container_labels: {}

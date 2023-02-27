@@ -22,7 +22,7 @@
     apps_with_icons: "{{ apps_with_icons | default([]) + [(item.logo | basename).split('.')[0]] }}"
   loop: "{{ web_applications + (homer_external_applications | default([])) }}"
 
-- name: Clone {{ homer_theme_repo }} theme repo
+- name: "Clone theme repo: {{ homer_theme_repo }}"
   ansible.builtin.git:
     repo: "https://github.com/{{ homer_theme_repo }}.git"
     dest: "{{ docker_dir }}/{{ container_name }}/theme"

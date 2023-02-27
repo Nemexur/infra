@@ -1,0 +1,11 @@
+---
+- name: Set DNSStubListener=no in systemd/resolved.conf
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/resolved.conf
+    state: present
+    regexp: '^#DNSStubListener=yes'
+    line: DNSStubListener=no
+  notify: restart systemd-resolved
+
+- name: Ensure handlers are notified now to avoid conflicts.
+  ansible.builtin.meta: flush_handlers

@@ -1,9 +1,4 @@
 ---
-nvidia_docker_url: nvidia.github.io/libnvidia-container
-nvidia_docker_id: "{{ ansible_distribution | lower }}{{  ansible_distribution_version }}"
-nvidia_docker_apt_filename: nvidia-container-toolkit
-nvidia_docker_gpg_keyring_path: "/usr/share/keyrings/{{ nvidia_docker_apt_filename }}-keyring.gpg"
+nvidia_docker_url: https://nvidia.github.io/libnvidia-container/centos8/libnvidia-container.repo
 nvidia_docker_packages:
-  - libnvidia-container1
-  - libnvidia-container-tools
   - nvidia-docker2

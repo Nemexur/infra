@@ -23,12 +23,12 @@
         group: "{{ default_group.name }}"
       when: not persistent_data.stat.exists
 
-    - name: "Check if the {{ mergerfs_root }}/docker-data exists"
+    - name: "Ensure docker-data folder exists in {{ mergerfs_root }}"
       ansible.builtin.stat:
         path: "{{ mergerfs_root }}/docker-data"
       register: backup_data
 
-    - name: Restore the "{{ docker_dir }}" folder from the MergerFS array
+    - name: "Restore the folder from the MergerFS array: {{ docker_dir }}"
       ansible.posix.synchronize:
         src: "{{ mergerfs_root }}/docker-data"
         dest: "{{ docker_dir }}/"

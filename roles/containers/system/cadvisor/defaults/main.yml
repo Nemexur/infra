@@ -1,7 +1,0 @@
----
-url: "cadvisor.{{ host_local }}"
-ipv4_address: "{{ traefik_internal_network_base }}.24"
-
-dashboard_name: cAdvisor
-dashboard_category: system
-dashboard_subtitle: Resource usage and performance characteristics of containers

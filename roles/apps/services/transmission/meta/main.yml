@@ -1,0 +1,44 @@
+---
+dependencies:
+  - role: core/container
+    container_name: transmission
+    container_image: lscr.io/linuxserver/transmission:latest
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+      - dest: "{{ docker_dir }}/{{ container_name }}/config"
+        owner: "{{ guid }}"
+      - dest: "{{ docker_dir }}/{{ container_name }}/watch"
+        owner: "{{ guid }}"
+      - dest: "{{ mergerfs_root }}/Downloads/Incomplete"
+        owner: "{{ guid }}"
+      - "{{ mergerfs_root }}/Downloads/Stuff"
+      - "{{ mergerfs_root }}/Downloads/Movies"
+      - "{{ mergerfs_root }}/Downloads/Books"
+      - "{{ mergerfs_root }}/Downloads/TV"
+    container_networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+    container_ports:
+      - 51413:51413/tcp
+      - 51413:51413/udp
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}/config:/config"
+      - "{{ docker_dir }}/{{ container_name }}/watch:/watch"
+      - "{{ mergerfs_root }}/Downloads/TV:/data/torrents/tv"
+      - "{{ mergerfs_root }}/Downloads/Books:/data/torrents/books"
+      - "{{ mergerfs_root }}/Downloads/Movies:/data/torrents/movies"
+      - "{{ mergerfs_root }}/Downloads/Stuff:/data/torrents/stuff"
+      - "{{ mergerfs_root }}/Downloads/Incomplete:/downloads/incomplete"
+    container_labels: |
+      {
+        "traefik.enable": "true",
+        "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "9091"
+      }

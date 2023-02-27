@@ -1,14 +1,9 @@
 ---
 container_directories: []
-container_pull: true
-container_privileged: false
-container_command: ""
-container_network_mode: default
-container_networks: []
-container_envs: {}
-container_ports: []
-container_runtime: runc
-container_devices: []
-container_sysctls: {}
-container_volumes: []
-container_labels: {}
+container_templates: []
+container_ssl_labels: |
+  {
+    "traefik.http.routers.{{ container_name }}.tls": "true",
+    "traefik.http.routers.{{ container_name }}.entrypoints": "websecure",
+    "traefik.http.routers.{{ container_name }}.tls.certresolver": "myresolver",
+  }

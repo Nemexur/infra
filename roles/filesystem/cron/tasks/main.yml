@@ -2,7 +2,7 @@
 - name: Ensure cron jobs are enabled
   ansible.builtin.cron:
     name: "{{ item.name }}"
-    job: "{{ item.job }}"
+    job: "{{ item.job | join('; ') }}"
     state: "{{ item.state | default('present') }}"
     month: "{{ item.month | default('*') }}"
     weekday: "{{ item.weekday | default('*') }}"

@@ -1,0 +1,7 @@
+---
+- name: Manage sebooleans
+  ansible.posix.seboolean:
+    name: "{{ item }}"
+    state: true
+    persistent: true
+  loop: "{{ security_sebooleans }}"

@@ -1,17 +1,46 @@
 ---
 log:
-  level: INFO
+  level: DEBUG
 
 api:
   insecure: true
   dashboard: true
 
 entryPoints:
+  metrics:
+    address: :8082
   web:
-    address: ":{{ traefik_web_port }}"
+    address: :80
+{% if ssl_enabled %}
+    http:
+      redirections:
+        entrypoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: "{{ email }}"
+      storage: /letsencrypt/acme.json
+      # caserver: https://acme-staging-v02.api.letsencrypt.org/directory"
+      dnsChallenge:
+        provider: duckdns
+{% endif %}
 
 providers:
   docker:
+    exposedByDefault: false
     endpoint: "unix:///var/run/docker.sock"
+    network: "{{ traefik_internal_network_name }}"
   file:
     filename: /configurations/dynamic.yml
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+    entryPoint: metrics

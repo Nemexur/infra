@@ -1,0 +1,36 @@
+---
+dependencies:
+  - role: core/container
+    container_name: flaresolverr
+    container_image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_network_mode: "{{ vpn_docker_network }}"
+    container_envs:
+      LOG_LEVEL: info
+      LOG_HTML: "false"
+      CAPTCHA_SOLVER: none
+      TZ: "{{ timezone }}"
+    container_sysctls:
+      net.ipv6.conf.all.disable_ipv6: 1
+    container_ssl_enabled: false
+    container_labels: {}
+  - role: core/container
+    container_name: jackett
+    container_image: lscr.io/linuxserver/jackett:latest
+    container_network_mode: "{{ vpn_docker_network }}"
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+    container_sysctls:
+      net.ipv6.conf.all.disable_ipv6: 1
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/config"
+    container_labels: |
+      {
+        "traefik.enable": "true",
+        "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "9117",
+      }

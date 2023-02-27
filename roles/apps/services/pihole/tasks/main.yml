@@ -1,0 +1,5 @@
+---
+- name: Import resolve tasks
+  ansible.builtin.import_tasks: resolve.yml
+- name: Import docker tasks
+  ansible.builtin.import_tasks: docker.yml

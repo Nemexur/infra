@@ -1,12 +1,14 @@
 ---
 - name: Ensure required directories are present
   ansible.builtin.file:
-    dest: "{{ item }}"
+    dest: "{{ item.dest | default(item) }}"
     state: directory
-    mode: 0755
+    mode: "{{ item.mode | default('755') }}"
   loop:
     - "{{ docker_dir }}/{{ container_name }}"
     - "{{ docker_dir }}/{{ container_name }}/configurations"
+    - dest: "{{ docker_dir }}/{{ container_name }}/letsencrypt"
+      mode: '600'
 
 - name: Copy static configuration
   ansible.builtin.template:
@@ -22,7 +24,7 @@
     mode: 0644
   register: traefik_dynamic_config
 
-- name: "Ensure {{ container_name }} container is up and running"
+- name: "Ensure container is up and running: {{ container_name }}"
   community.docker.docker_container:
     name: "{{ container_name }}"
     state: started
@@ -36,13 +38,16 @@
           - "{{ container_name }}"
     env:
       TZ: "{{ timezone }}"
+      DUCKDNS_TOKEN: "{{ duckdns_token }}"
     ports:
-      - "{{ traefik_web_port }}:80"
-      - 443:443
-      - 8080:8080
+      - 80:80/tcp
+      - 443:443/tcp
+      - 8080:8080/tcp
+      - 8082:8082/tcp
     volumes:
       - "{{ docker_dir }}/{{ container_name }}/traefik.yml:/etc/traefik/traefik.yml:ro"
       - "{{ docker_dir }}/{{ container_name }}/configurations:/configurations"
+      - "{{ docker_dir }}/{{ container_name }}/letsencrypt:/letsencrypt"
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels: "{{ container_labels }}"
     recreate: "{{ (traefik_static_config is changed) or (traefik_dynamic_config is changed) }}"

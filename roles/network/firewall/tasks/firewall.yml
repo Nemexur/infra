@@ -1,0 +1,21 @@
+---
+- name: Add new rules to /etc/firewalld
+  when: security_firewall_services_dir | length > 0
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/firewalld/services/{{ item | basename }}"
+    mode: 0644
+  with_fileglob: "{{ security_firewall_services_dir }}/*.xml"
+  notify:
+    - reload firewalld
+    - sleep 10 seconds
+  register: _security_firewall_services
+
+- name: Ensure rules are added to firewall
+  ansible.posix.firewalld:
+    service: "{{ item.service | default(omit) }}"
+    port: "{{ item.port | default(omit) }}"
+    state: "{{ item.state | default('enabled') }}"
+    permanent: "{{ item.permanent | default(true) | bool }}"
+  loop: "{{ security_firewall_rules }}"
+  notify: reload firewalld

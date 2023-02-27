@@ -1,0 +1,19 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{{ ansible_managed | comment }}
+# https://crazymax.dev/diun/config/
+---
+db:
+  path: {{ diun_db_path }}
+watch:
+  workers: {{ diun_watch_workers }}
+  schedule: {{ diun_watch_schedule | quote }}
+notif:
+  telegram:
+    token: {{ diun_telegram_token }}
+    chatIDs:
+      {{ diun_telegram_chatids | to_nice_yaml(indent=6) | indent(6, False) }}
+providers:
+  docker:
+    watchStopped: false
+    watchByDefault: true
+    endpoint: "unix:///var/run/docker.sock"

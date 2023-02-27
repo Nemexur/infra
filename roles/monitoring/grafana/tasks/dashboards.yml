@@ -1,0 +1,35 @@
+---
+- name: Ensure grafana dashboards are registered (no provision)
+  when: not grafana_use_provisioning
+  community.grafana.grafana_dashboard:
+    grafana_url: "{{ grafana_api_url }}"
+    grafana_user: "{{ grafana_security.admin_user }}"
+    grafana_password: "{{ grafana_security.admin_password }}"
+    path: "{{ item }}"
+    message: Update by ansible
+    state: present
+    overwrite: true
+  with_fileglob: "{{ grafana_dashboards_dir }}/*.json"
+
+- name: Ensure grafana dashboards are registered (provision)
+  when: grafana_use_provisioning
+  ansible.builtin.copy:
+    dest: "{{ docker_dir }}/{{ container_name }}/config/provisioning/dashboards/ansible.yml"
+    mode: 0664
+    content: |
+      apiVersion: 1
+      providers:
+        - name: "default"
+          orgId: 1
+          folder: ""
+          type: file
+          options:
+            path: "{{ grafana_data_dir }}/dashboards"
+  notify: restart grafana
+
+- name: Copy grafana dashboards
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ docker_dir }}/{{ container_name }}/data/dashboards/{{ item | basename }}"
+    mode: 0664
+  with_fileglob: "{{ grafana_dashboards_dir }}/*.json"

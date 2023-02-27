@@ -1,0 +1,26 @@
+---
+dependencies:
+  - role: core/container
+    container_name: plex
+    container_image: lscr.io/linuxserver/plex:latest
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+      - "{{ mergerfs_root }}/Media/Movies"
+      - "{{ mergerfs_root }}/Media/TV"
+    container_network_mode: host
+    container_runtime: "{{ nvidia_docker_enabled | default(false) | bool | ternary('nvidia', 'runc') }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+      VERSION: latest
+      NVIDIA_VISIBLE_DEVICES: all
+    container_devices:
+      - /dev/dri:/dev/dri
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/config"
+      - "{{ mergerfs_root }}/Media/Movies:/movies"
+      - "{{ mergerfs_root }}/Media/TV:/tv"
+    container_ssl_enabled: false
+    container_labels: {}

@@ -4,12 +4,14 @@
   become: false
   ansible.builtin.find:
     paths:
-      - "{{ playbook_dir }}/roles/containers/services"
-      - "{{ playbook_dir }}/roles/containers/media"
-      - "{{ playbook_dir }}/roles/containers/system"
-      - "{{ playbook_dir }}/roles/network"
+      - "{{ playbook_dir }}/roles/apps/services"
+      - "{{ playbook_dir }}/roles/apps/media"
+      - "{{ playbook_dir }}/roles/apps/system"
     file_type: directory
-    excludes: homer
+    excludes:
+      - homer
+      - letsencrypt
+      - wireguard
     recurse: false
   register: infra_containers
 
@@ -31,7 +33,7 @@
       {{ web_applications | default([]) +
       [{'logo': 'assets/tools/homer-icons/' + item.path.split('/')[-1] + '.png',
       'name': lookup('vars', item.path.split('/')[-1])['dashboard_name'] | default(item.path.split('/')[-1] | title),
-      'url' : 'http://' + (lookup('vars', item.path.split('/')[-1])['url'] | default('')),
+      'url' : 'https://' + (lookup('vars', item.path.split('/')[-1])['url'] | default('')),
       'subtitle' : lookup('vars', item.path.split('/')[-1])['dashboard_subtitle'] | default(''),
       'category': lookup('vars', item.path.split('/')[-1])['dashboard_category'] | default ('')}] }}
   loop: "{{ infra_containers.files }}"

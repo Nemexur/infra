@@ -1,9 +1,4 @@
 ---
-- name: Ensure mergerfs is present
-  ansible.builtin.apt:
-    name: mergerfs
-    state: present
-
 - name: Ensure mount points exists for drive
   ansible.builtin.file:
     dest: "{{ item.name }}"

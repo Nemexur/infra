@@ -1,0 +1,31 @@
+---
+dependencies:
+  - role: core/container
+    container_name: wireguard
+    container_image: weejewel/wg-easy:latest
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+    container_capabilities:
+      - NET_ADMIN
+      - SYS_MODULE
+    container_envs:
+      WG_HOST: "{{ wireguard_host }}"
+      WG_DEFAULT_DNS: "{{ groups['monitoring'] | first }}"
+      WG_PORT: "{{ wireguard_port | quote }}"
+      WG_PERSISTENT_KEEPALIVE: "25"
+      WG_POST_UP: >-
+        iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE;
+        iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
+        iptables -A FORWARD -i wg0 -j ACCEPT;
+        iptables -A FORWARD -o wg0 -j ACCEPT
+    container_ports:
+      - "{{ wireguard_port }}:{{ wireguard_port }}/udp"
+      - "51821:51821/tcp"
+    container_sysctls:
+      net.ipv4.ip_forward: 1
+      net.ipv4.conf.all.src_valid_mark: 1
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/etc/wireguard"
+    container_ssl_enabled: false
+    container_labels: {}

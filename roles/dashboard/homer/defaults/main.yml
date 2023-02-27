@@ -11,6 +11,12 @@ homer_external_applications: []
 
 container_name: homer
 container_image: b4bz/homer:latest
-container_labels:
-  traefik.http.routers.homer.rule: Host(`{{ url }}`)
-  traefik.http.services.homer.loadbalancer.server.port: "8080"
+container_labels: |
+  {
+    "traefik.enable": "true",
+    "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
+    "traefik.http.routers.{{ container_name }}.tls": "true",
+    "traefik.http.routers.{{ container_name }}.entrypoints": "websecure",
+    "traefik.http.routers.{{ container_name }}.tls.certresolver": "myresolver",
+    "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "8080",
+  }

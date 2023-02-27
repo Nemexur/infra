@@ -5,38 +5,73 @@ http:
       rule: "Host(`grafana.{{ host_local }}`)"
       service: grafana-service
       priority: 1000
+      tls:
+        certresolver: myresolver
       entryPoints:
-        - web
+        - websecure
     pihole:
       rule: "Host(`pihole.{{ host_local }}`)"
       service: pihole-service
-      middlewares:
-        - pihole-admin-prefix
       priority: 1000
+      tls:
+        certresolver: myresolver
       entryPoints:
-        - web
+        - websecure
     plex:
       rule: "Host(`plex.{{ host_local }}`)"
       service: plex-service
       priority: 1000
+      tls:
+        certresolver: myresolver
       entryPoints:
-        - web
-
-  middlewares:
-    pihole-admin-prefix:
-      addPrefix:
-        prefix: /admin
+        - websecure
+    portainer-alice:
+      rule: "Host(`portainer-alice.{{ host_local }}`)"
+      service: portainer-alice-service
+      priority: 1000
+      tls:
+        certresolver: myresolver
+      entryPoints:
+        - websecure
+    portainer-bravo:
+      rule: "Host(`portainer-bravo.{{ host_local }}`)"
+      service: portainer-bravo-service
+      priority: 1000
+      tls:
+        certresolver: myresolver
+      entryPoints:
+        - websecure
+    wireguard-ui:
+      rule: "Host(`wireguard-ui.{{ host_local }}`)"
+      service: wireguard-ui-service
+      priority: 1000
+      tls:
+        certresolver: myresolver
+      entryPoints:
+        - websecure
 
   services:
     grafana-service:
       loadBalancer:
         servers:
           - url: "http://{{ groups['monitoring'] | first }}:3000"
+    wireguard-ui-service:
+      loadBalancer:
+        servers:
+          - url: "http://{{ groups['monitoring'] | first }}:51821"
+    portainer-bravo-service:
+      loadBalancer:
+        servers:
+          - url: "http://{{ groups['monitoring'] | first }}:9000"
     pihole-service:
       loadBalancer:
         servers:
-          - url: "http://{{ groups['home'] | first }}:{{ pihole_web_port }}"
+          - url: "http://{{ groups['monitoring'] | first }}:{{ pihole_web_port }}"
     plex-service:
       loadBalancer:
         servers:
           - url: "http://{{ groups['home'] | first }}:32400"
+    portainer-alice-service:
+      loadBalancer:
+        servers:
+          - url: "http://{{ groups['home'] | first }}:9000"

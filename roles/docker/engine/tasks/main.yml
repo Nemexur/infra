@@ -1,0 +1,37 @@
+---
+- name: Ensure dnf-plugins-core is present
+  ansible.builtin.dnf:
+    name: dnf-plugins-core
+    state: present
+
+- name: Add docker config-manager
+  ansible.builtin.command:
+    cmd: "dnf config-manager --add-repo {{ engine_docker_url }}"
+    creates: "/etc/yum.repos.d/{{ engine_docker_url.split('/')[-1] }}"
+
+- name: Force update dnf cache
+  ansible.builtin.dnf:
+    update_cache: true
+
+- name: Ensure docker packages are present
+  ansible.builtin.dnf:
+    name: "{{ item.name | default(item) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ engine_docker_packages }}"
+  notify: restart docker
+
+- name: Ensure docker is started and enabled on boot
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Ensure handlers are flushed now
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure docker users are added to the docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ docker_users }}"

@@ -1,0 +1,45 @@
+---
+- name: Ensure moreutils and smartmontools are installed
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - moreutils
+    - smartmontools
+
+- name: Download smartmon.py
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/prometheus-community/node-exporter-textfile-collector-scripts/master/smartmon.py
+    dest: /usr/local/bin
+    owner: "{{ default_owner.name }}"
+    group: "{{ default_group.name }}"
+    mode: 0755
+
+- name: Make sure the text output directory exists
+  ansible.builtin.file:
+    path: "{{ smartmon_exporter_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ default_owner.name }}"
+    group: "{{ default_group.name }}"
+    mode: 0755
+
+- name: Install the systemd service
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    mode: 0755
+    owner: "root"
+    group: "root"
+  notify: monitoring systemd reload
+  loop:
+    - smartmon.service
+    - smartmon.timer
+
+- name: Start and enable the systemd services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - smartmon.timer

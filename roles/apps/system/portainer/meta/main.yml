@@ -1,0 +1,20 @@
+---
+dependencies:
+  - role: core/container
+    container_name: portainer
+    container_image: portainer/portainer-ce:latest
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+    container_ports:
+      - "{{ portainer_http_port }}:{{ portainer_http_port }}/tcp"
+      - "{{ portainer_https_port }}:{{ portainer_https_port }}/tcp"
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/data"
+      - /var/run/docker.sock:/var/run/docker.sock
+    container_ssl_enabled: false
+    container_labels: {}

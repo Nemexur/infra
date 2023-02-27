@@ -1,0 +1,32 @@
+---
+- name: Ensure grafana datasources are present (no provision)
+  when: not grafana_use_provisioning
+  community.grafana.grafana_datasource:
+    grafana_url: "{{ grafana_api_url }}"
+    grafana_user: "{{ grafana_security.admin_user }}"
+    grafana_password: "{{ grafana_security.admin_password }}"
+    name: "{{ item.name }}"
+    state: "{{ item.state | default('present') }}"
+    url: "{{ item.url }}"
+    ds_type: "{{ item.type }}"
+    access: "{{ item.access | default(omit) }}"
+    is_default: "{{ item.is_default | default(omit) }}"
+    basic_auth_user: "{{ item.basic_auth_user | default(omit) }}"
+    basic_auth_password: "{{ item.basic_auth_password | default(omit) }}"
+    database: "{{ item.database | default(omit) }}"
+    user: "{{ item.user | default(omit) }}"
+    password: "{{ item.password | default(omit) }}"
+  loop: "{{ grafana_datasources }}"
+
+- name: Ensure grafana datasources are present (provision)
+  when: grafana_use_provisioning
+  ansible.builtin.copy:
+    dest: "{{ docker_dir }}/{{ container_name }}/config/provisioning/datasources/ansible.yml"
+    content: |
+      apiVersion: 1
+      deleteDatasources: []
+      datasources:
+      {{ grafana_datasources | to_nice_yaml }}
+    backup: false
+    mode: 0644
+  notify: restart grafana

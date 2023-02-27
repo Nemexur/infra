@@ -1,0 +1,43 @@
+---
+- name: Ensure these groups exist
+  ansible.builtin.group:
+    name: "{{ item.name }}"
+    gid: "{{ item.gid | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+  when: item.create | default(true) | bool
+  loop: "{{ system_users }}"
+
+- name: Ensure these users exist
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups }}"
+    uid: "{{ item.uid | default(omit) }}"
+    password: "{{ item.password | default(omit) }}"
+    update_password: "{{ item.update_password | default('on_create') }}"
+    state: "{{ item.state | default('present') }}"
+    append: "{{ item.append | default(true) | bool }}"
+  when: item.create | default(true) | bool
+  loop: "{{ system_users }}"
+
+- name: Allow sudo group to have passwordless sudo
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%{{ sudo_group }}'
+    line: '%{{ sudo_group }} ALL=(ALL) NOPASSWD: ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: "Copy the public SSH key for {{ username }}"
+  ansible.posix.authorized_key:
+    user: "{{ username }}"
+    state: present
+    key: "{{ ssh_public_key }}"
+  when: ssh_public_key
+  notify: remove default user
+
+- name: Set default shell for users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+  when: item.create | default(true) | bool
+  loop: "{{ system_users }}"

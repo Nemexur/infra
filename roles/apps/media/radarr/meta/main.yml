@@ -1,0 +1,25 @@
+---
+dependencies:
+  - role: core/container
+    container_name: radarr
+    container_image: lscr.io/linuxserver/radarr:latest
+    container_network_mode: "{{ vpn_docker_network }}"
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+      - "{{ mergerfs_root }}/Media/Movies"
+      - "{{ mergerfs_root }}/Downloads/Movies"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/config"
+      - "{{ mergerfs_root }}/Media/Movies:/data/media/movies"
+      - "{{ mergerfs_root }}/Downloads/Movies:/data/torrents/movies"
+    container_labels: |
+      {
+        "traefik.enable": "true",
+        "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "7878",
+      }

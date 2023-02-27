@@ -37,9 +37,11 @@
         group: "{{ default_group.name }}"
 
     - name: Ensure ip6table_filter module is present
-      community.general.modprobe: name=ip6table_filter state=present
+      community.general.modprobe:
+        name: ip6table_filter
+        state: present
 
-- name: "Ensure {{ container_name }} docker client is up and running"
+- name: "Ensure docker client is up and running: {{ container_name }}"
   community.docker.docker_container:
     name: "{{ container_name }}"
     state: started
@@ -57,18 +59,8 @@
       ROUTE_TRAEFIK_NETWORK: "{{ traefik_internal_network_iprange }}"
     capabilities:
       - NET_ADMIN
-    dns_servers:
-      - 1.1.1.1
-      - 8.8.8.8
-      - 4.4.4.4
     security_opts:
       - label:disable
-    ports:
-      # Deluge Ports
-      - 58846:58846/tcp
-      - 58846:58846/udp
-      - 6881:6881/tcp
-      - 6881:6881/udp
     volumes:
       - /dev/net:/dev/net:z
       - "{{ docker_dir }}/{{ container_name }}/clients:/vpn"

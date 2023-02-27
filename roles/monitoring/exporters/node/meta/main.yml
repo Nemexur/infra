@@ -1,0 +1,16 @@
+---
+dependencies:
+  - role: core/container
+    container_name: node_exporter
+    container_image: quay.io/prometheus/node-exporter:latest
+    container_command: "{{ node_exporter_command + (node_exporter_enabled_collectors | map('regex_replace', '(.+)', '--collector.\\1') | list) }}"
+    container_network_mode: host
+    container_pid: host
+    container_privileged: true
+    container_volumes:
+      - /:/rootfs:ro,rslave
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run:/var/run:ro
+    container_ssl_enabled: false
+    container_labels: {}

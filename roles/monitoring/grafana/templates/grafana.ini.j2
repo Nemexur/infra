@@ -1,0 +1,44 @@
+{{ ansible_managed | comment }}
+# More informations:
+# http://docs.grafana.org/installation/configuration
+# https://github.com/grafana/grafana/blob/master/conf/sample.ini
+
+app_mode = production
+grafana_instance: "{{ grafana_instance }}"
+
+# Directories
+[paths]
+data = {{ grafana_data_dir }}
+plugins = {{ grafana_data_dir }}/plugins
+
+# HTTP options
+[server]
+http_addr = {{ grafana_address }}
+http_port = {{ grafana_port }}
+
+# Security
+[security]
+{% for k, v in grafana_security.items() %}
+{{ k }} = {{ v }}
+{% endfor %}
+
+# Dashboards
+[dashboards]
+versions_to_keep = 10
+
+[dashboards.json]
+enabled = true
+path = {{ grafana_data_dir }}/dashboards
+
+# Alerting
+[alerting]
+{% if grafana_alerting != {} %}
+enabled = true
+{%   for k,v in grafana_alerting.items() %}
+{%     if k != 'enabled' %}
+{{ k }} = {{ v }}
+{%     endif %}
+{%   endfor %}
+{% else %}
+enabled = false
+{% endif %}

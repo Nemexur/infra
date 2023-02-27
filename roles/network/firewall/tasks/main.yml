@@ -1,0 +1,5 @@
+---
+- name: Import firewall tasks
+  ansible.builtin.import_tasks: firewall.yml
+- name: Import sebooleans tasks
+  ansible.builtin.import_tasks: sebooleans.yml

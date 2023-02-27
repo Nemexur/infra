@@ -1,0 +1,4 @@
+---
+diun_db_path: diun.db
+diun_watch_workers: 20
+diun_watch_schedule: "0 */6 * * *"

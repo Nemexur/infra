@@ -6,8 +6,7 @@ help:
 	@echo "  \033[00;32mlint\033[0m  - run linting in the code base."
 
 setup:
-	ansible-galaxy install -vr requirements.yml
-	@echo "[ \033[00;33mDo not forget to set OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES\033[0m ]"
+	ansible-galaxy install --role-file requirements.yml -v
 
 lint:
 	@echo "[ \033[00;33mYamllint\033[0m ]"

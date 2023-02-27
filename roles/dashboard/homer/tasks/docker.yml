@@ -8,7 +8,7 @@
     group: "{{ default_group.name }}"
   register: homer_config
 
-- name: "Ensure {{ container_name }} container is up and running"
+- name: "Ensure container is up and running: {{ container_name }}"
   community.docker.docker_container:
     name: "{{ container_name }}"
     state: started

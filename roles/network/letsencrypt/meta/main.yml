@@ -1,0 +1,31 @@
+---
+dependencies:
+  - role: core/container
+    container_name: duckdns
+    container_image: maksimstojkovic/duckdns:latest
+    container_envs:
+      DUCKDNS_TOKEN: "{{ duckdns_token }}"
+      DUCKDNS_DOMAIN: "{{ duckdns_domain }}"
+      DUCKDNS_DELAY: "5"
+    container_ssl_enabled: false
+    container_labels: {}
+  - role: core/container
+    container_name: letsencrypt
+    container_image: maksimstojkovic/letsencrypt:latest
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+      - dest: "{{ docker_dir }}/{{ container_name }}/certs"
+        owner: "{{ guid }}"
+    container_envs:
+      UID: "{{ guid }}"
+      GID: "{{ default_group.id }}"
+      DUCKDNS_TOKEN: "{{ duckdns_token }}"
+      DUCKDNS_DOMAIN: "{{ duckdns_domain }}"
+      DUCKDNS_DELAY: "5"
+      LETSENCRYPT_WILDCARD: "true"
+      LETSENCRYPT_EMAIL: "{{ email }}"
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}/certs:/etc/letsencrypt"
+    container_ssl_enabled: false
+    container_labels: {}

@@ -1,0 +1,6 @@
+---
+node_exporter_command:
+  - --path.rootfs=/rootfs
+  - --path.procfs=/host/proc
+  - --path.sysfs=/host/sys
+node_exporter_enabled_collectors: []

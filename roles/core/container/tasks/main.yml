@@ -6,23 +6,46 @@
     mode: 0775
     owner: "{{ item.owner | default(default_owner.name) }}"
     group: "{{ item.group | default(default_group.name) }}"
-  loop: "{{ container_directories }}"
+  loop: "{{ container_directories | default([]) }}"
+  register: _container_directories
 
-- name: "Ensure {{ container_name }} container is up and running"
+- name: "Generate templates for {{ container_name }}"
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0775
+    owner: "{{ item.owner | default(default_owner.name) }}"
+    group: "{{ item.group | default(default_group.name) }}"
+  loop: "{{ container_templates | default([]) }}"
+  register: _container_templates
+
+- name: Ensure ssl labels are present if needed
+  ansible.builtin.set_fact:
+    _container_labels: "{{ container_labels | combine(container_ssl_labels) }}"
+  when:
+    - ssl_enabled | default(false) | bool
+    - container_ssl_enabled | default(true) | bool
+
+- name: "Ensure container is up and running: {{ container_name }}"
   community.docker.docker_container:
     name: "{{ container_name }}"
+    image: "{{ container_image }}"
     state: "{{ container_state | default('started') }}"
     restart_policy: "{{ container_restart_policy | default('unless-stopped') }}"
-    image: "{{ container_image }}"
-    pull: "{{ container_pull | default(true) | bool }}"
+    pull: "{{ container_pull | default(false) | bool }}"
     privileged: "{{ container_privileged | default(false) | bool }}"
-    command: "{{ container_command }}"
-    network_mode: "{{ container_network_mode | default('default') }}"
-    networks: "{{ container_networks }}"
-    env: "{{ container_envs }}"
-    ports: "{{ container_ports }}"
-    runtime: "{{ container_runtime }}"
-    devices: "{{ container_devices }}"
-    sysctls: "{{ container_sysctls }}"
-    volumes: "{{ container_volumes }}"
-    labels: "{{ container_labels }}"
+    command: "{{ container_command | default(omit) }}"
+    user: "{{ container_user | default(omit) }}"
+    network_mode: "{{ container_network_mode | default(omit) }}"
+    pid_mode: "{{ container_pid | default(omit) }}"
+    ipc_mode: "{{ container_ipc | default(omit) }}"
+    networks: "{{ container_networks | default(omit) }}"
+    capabilities: "{{ container_capabilities | default(omit) }}"
+    env: "{{ container_envs | default(omit) }}"
+    ports: "{{ container_ports | default(omit) }}"
+    runtime: "{{ container_runtime | default(omit) }}"
+    devices: "{{ container_devices | default(omit) }}"
+    sysctls: "{{ container_sysctls | default(omit) }}"
+    volumes: "{{ container_volumes | default(omit) }}"
+    labels: "{{ container_ssl_enabled | default(true) | bool | ternary(_container_labels, container_labels) }}"
+    recreate: "{{ (_container_directories is changed) or (_container_templates is changed) }}"

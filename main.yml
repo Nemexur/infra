@@ -1,178 +1,188 @@
 ---
-- name: Set ssh port
+- name: Setup ssh connection
   hosts: all
   tags: always
   gather_facts: false
 
   tasks:
-    - import_tasks: tasks/ssh-juggle-port.yml
+    - name: ssh | import tasks
+      ansible.builtin.import_tasks: tasks/ssh-juggle-port.yml
 
-- name: Run basic setup for all hosts
+- name: Reboot if needed
   hosts: all
   become: true
-  tags: always
 
-  roles:
-    - role: geerlingguy.ntp
-      ansible_os_family: "{{ ansible_facts['os_family'] }}"
-
-- name: Setup home-server
-  hosts: home
-  become: true
-
-  vars:
-    ansible_distribution: "Ubuntu"
+  pre_tasks:
+    - name: reboot | import tasks
+      ansible.builtin.import_tasks: tasks/reboot-required.yml
 
   roles:
     #
-    # Essential
+    # System
     #
-    - role: system/essential
-      tags: essential
+    - role: system/users
+      tags:
+        - users
+        - system
     - role: system/packages
       tags:
         - packages
-        - essential
-    #
-    # Filesystem
-    #
-    - role: mrlesmithjr.zfs
+        - system
+    - role: system/powersaving
       tags:
-        - zfs
-        - filesystem
-      when: nas_stuff_enabled | default(false) | bool
-    - role: filesystem/mergerfs
-      tags:
-        - mergerfs
-        - filesystem
-      when: nas_stuff_enabled | default(false) | bool
-    - role: bertvv.samba
-      tags:
-        - samba
-        - filesystem
-      when: samba_enabled | default(false) | bool
-    - role: filesystem/cron
-      tags:
-        - cron
-        - filesystem
+        - powersaving
+        - system
+      when: powersaving_enabled | default(false) | bool
     #
     # Docker
     #
-    - role: geerlingguy.docker
+    - role: docker/engine
       tags: docker
     - role: docker/nvidia
       tags: docker
       when: nvidia_docker_enabled | default(false) | bool
     - role: docker/backup
       tags: docker
+      when: docker_backup_enabled | default(false) | bool
     #
     # Network
     #
+    - role: network/firewall
+      tags:
+        - firewall
+        - network
+
+- name: Configure filesystem and shares
+  hosts: home
+  become: true
+  tags: filesystem
+
+  vars:
+    ansible_selinux:
+      status: disabled
+
+  roles:
+    #
+    # Filesystem
+    #
+    - role: mrlesmithjr.zfs
+      tags: zfs
+      when: nas_stuff_enabled | default(false) | bool
+    - role: filesystem/mergerfs
+      tags: mergerfs
+      when: nas_stuff_enabled | default(false) | bool
+    - role: bertvv.samba
+      tags: samba
+      when: samba_enabled | default(false) | bool
+    - role: filesystem/cron
+      tags: cron
+
+- name: Setup apps and network
+  hosts: all
+  become: true
+  tags: apps
+
+  roles:
+    #
+    # Network
+    #
+    - role: network/letsencrypt
+      tags:
+        - letsencrypt
+        - duskdns
+        - network
+      when:
+        - inventory_hostname in groups["monitoring"]
+        - letsencrypt_enabled | default(false) | bool
     - role: network/traefik
       tags:
         - traefik
         - network
-        - apps
-      when: traefik_enabled | default(false) | bool
+      when:
+        - inventory_hostname in groups["home"]
+        - traefik_enabled | default(false) | bool
     - role: network/openvpn
       tags:
-        - openvpn
+        - open-vpn
         - network
-        - apps
-      when: vpn_docker_network_enabled | default(false) | bool
-    #
-    # Containers/System
-    #
-    - role: containers/system/cadvisor
+      when:
+        - inventory_hostname in groups["home"]
+        - vpn_docker_network_enabled | default(false) | bool
+    - role: network/wireguard
       tags:
-        - cadvisor
-        - containers
-        - containers/system
-        - apps
-    - role: containers/system/watchtower
+        - wireguard
+        - network
+      when:
+        - inventory_hostname in groups["monitoring"]
+        - vpn_enabled | default(false) | bool
+    #
+    # Apps/System
+    #
+    - role: apps/system/diun
       tags:
-        - watchtower
-        - containers
-        - containers/system
-        - apps
-    - role: containers/system/portainer
+        - diun
+        - apps/system
+      when: diun_enabled | default(false) | bool
+    - role: apps/system/portainer
       tags:
         - portainer
-        - containers
-        - containers/system
-        - apps
+        - apps/system
     #
-    # Containers/Services
+    # Apps/Services
     #
-    - role: containers/services/pihole
+    - role: apps/services/pihole
       tags:
         - pihole
-        - containers
-        - containers/services
-        - apps
-    - role: containers/services/transmission
+        - apps/services
+      when: inventory_hostname in groups["monitoring"]
+    - role: apps/services/transmission
       tags:
         - transmission
-        - containers
-        - containers/services
-        - apps
-    - role: containers/services/deluge
-      tags:
-        - deluge
-        - containers
-        - containers/services
-        - apps
+        - apps/services
+      when: inventory_hostname in groups["home"]
     #
-    # Containers/Media
+    # Apps/Media
     #
-    - role: containers/media/bazarr
+    - role: apps/media/bazarr
       tags:
         - bazarr
-        - containers
-        - containers/media
-        - apps
-    - role: containers/media/jackett
+        - apps/media
+      when: inventory_hostname in groups["home"]
+    - role: apps/media/jackett
       tags:
         - jackett
-        - containers
-        - containers/media
-        - apps
-    - role: containers/media/jellyfin
+        - apps/media
+      when: inventory_hostname in groups["home"]
+    - role: apps/media/jellyfin
       tags:
         - jellyfin
-        - containers
-        - containers/media
-        - apps
-    - role: containers/media/plex
+        - apps/media
+      when: inventory_hostname in groups["home"]
+    - role: apps/media/plex
       tags:
         - plex
-        - containers
-        - containers/media
-        - apps
-    - role: containers/media/prowlarr
+        - apps/media
+      when: inventory_hostname in groups["home"]
+    - role: apps/media/prowlarr
       tags:
         - prowlarr
-        - containers
-        - containers/media
-        - apps
-    - role: containers/media/radarr
+        - apps/media
+      when: inventory_hostname in groups["home"]
+    - role: apps/media/radarr
       tags:
         - radarr
-        - containers
-        - containers/media
-        - apps
-    - role: containers/media/readarr
+        - apps/media
+      when: inventory_hostname in groups["home"]
+    - role: apps/media/readarr
       tags:
         - readarr
-        - containers
-        - containers/media
-        - apps
-    - role: containers/media/sonarr
+        - apps/media
+      when: inventory_hostname in groups["home"]
+    - role: apps/media/sonarr
       tags:
         - sonarr
-        - containers
-        - containers/media
-        - apps
+        - apps/media
+      when: inventory_hostname in groups["home"]
     #
     # Dashboard
     #
@@ -180,45 +190,49 @@
       tags:
         - homer
         - dashboard
-        - apps
-      when: dashboard_enabled | default(false) | bool
-    #
-    # Monitoring
-    #
-    - role: system/smart-monitoring
-      tags:
-        - smart
-        - monitoring
-      when: smart_monitoring_enabled | default(false) | bool
-    - role: stuvusit.smartd
-      tags:
-        - smart
-        - monitoring
-      when: smart_monitoring_enabled | default(false) | bool
-
-- name: Setup VPN to local network
-  hosts: vpn
-  become: true
-
-  roles:
-    - role: network/algo
-      tags: vpn
-      when: vpn_enabled | default(false) | bool
+      when:
+        - inventory_hostname in groups["home"]
+        - dashboard_enabled | default(false) | bool
 
 - name: Setup metric exporters
-  hosts: exporters
+  hosts: all
   become: true
   tags: monitoring
 
   roles:
-    - role: cloudalchemy.node_exporter
+    #
+    # System monitoring
+    #
+    - role: geerlingguy.node_exporter
       tags:
         - node
         - exporters
-    - role: system/nvidia-gpu-exporter
+    - role: monitoring/exporters/nvidia_gpu
       tags:
         - nvidia
         - exporters
+      when: nvidia_docker_enabled | default(false) | bool
+    - role: monitoring/exporters/cadvisor
+      tags:
+        - cadvisor
+        - exporters
+    #
+    # Disks monitoring
+    #
+    - role: monitoring/smart
+      tags:
+        - smart
+        - monitoring
+      when:
+        - inventory_hostname in groups["home"]
+        - smart_monitoring_enabled | default(false) | bool
+    - role: stuvusit.smartd
+      tags:
+        - smart
+        - monitoring
+      when:
+        - inventory_hostname in groups["home"]
+        - smart_monitoring_enabled | default(false) | bool
 
 - name: Setup monitoring system
   hosts: monitoring
@@ -226,9 +240,9 @@
   tags: monitoring
 
   roles:
-    - role: cloudalchemy.prometheus
+    - role: monitoring/prometheus
       tags: prometheus
-    - role: cloudalchemy.grafana
+    - role: monitoring/grafana
       tags: grafana
 
 - name: Setup security for all hosts

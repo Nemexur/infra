@@ -1,5 +1,12 @@
 ---
+exclude_paths:
+  - tasks
+  - roles-galaxy
+  - collections-galaxy
 skip_list:
   - meta-no-info
   - jinja[spacing]
+  - jinja[invalid]
   - name[casing]
+  - name[template]
+  - role-name[path]

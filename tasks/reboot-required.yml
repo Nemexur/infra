@@ -1,0 +1,10 @@
+---
+- name: Check if reboot required
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+  register: _reboot_required_file
+
+- name: Reboot if required
+  ansible.builtin.reboot:
+    msg: Rebooting due to a kernel update
+  when: _reboot_required_file.stat.exists

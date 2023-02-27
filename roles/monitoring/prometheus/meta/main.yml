@@ -1,0 +1,34 @@
+---
+dependencies:
+  - role: core/container
+    container_name: prometheus
+    container_image: prom/prometheus:latest
+    container_user: "{{ prometheus_uid }}"
+    container_command:
+      - --web.listen-address={{ prometheus_web_address }}
+      - --config.file=/etc/prometheus/prometheus.yaml
+      - --storage.tsdb.path=/var/lib/prometheus
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.enable-lifecycle
+      - --storage.tsdb.retention.time={{ prometheus_storage_retention }}
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: prometheus
+        group: users
+      - dest: "{{ docker_dir }}/{{ container_name }}/data"
+        owner: prometheus
+        group: users
+      - dest: "{{ docker_dir }}/{{ container_name }}/config"
+        owner: prometheus
+        group: users
+    container_templates:
+      - src: prometheus.yaml.j2
+        dest: "{{ docker_dir }}/{{ container_name }}/config/prometheus.yaml"
+    container_ports:
+      - "{{ prometheus_port }}:{{ prometheus_port }}/tcp"
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}/config:/etc/prometheus"
+      - "{{ docker_dir }}/{{ container_name }}/data:/var/lib/prometheus"
+    container_ssl_enabled: false
+    container_labels: {}
