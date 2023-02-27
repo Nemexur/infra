@@ -41,7 +41,7 @@ Everything is deployed as docker containers.
 
 ### Applications
 
-All of the values in hierarchy below are tags (**lowercased**) in [main.yml](main.yml). Highlighted words indicate servers the tag is being used with. There are probably some mistakes in the structure below.
+All of the values in hierarchy below are tags (**lowercased**) in [main.yml](main.yml). Highlighted words indicate servers the tag is being used with. There are few mistakes in the structure below probably.
 
 - [VPN](https://github.com/WeeJeWel/wg-easy) - setup WireGuard Easy container `Monitoring`.
 - Essential - essential setup like users, groups and powersaving `Home/Monitoring`.
