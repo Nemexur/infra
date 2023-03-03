@@ -29,7 +29,6 @@
     name: "{{ container_name }}"
     state: started
     image: "{{ container_image }}"
-    pull: true
     restart_policy: unless-stopped
     networks:
       - name: "{{ traefik_internal_network_name }}"

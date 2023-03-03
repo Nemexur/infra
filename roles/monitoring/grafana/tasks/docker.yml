@@ -21,13 +21,12 @@
     dest: "{{ docker_dir }}/{{ container_name }}/config/grafana.ini"
     mode: 0644
 
-- name: "Ensure container is up and running: grafana"
+- name: "Ensure container is up and running: {{ container_name }}"
   community.general.docker_container:
     name: "{{ container_name }}"
     state: started
     restart_policy: unless-stopped
     image: grafana/grafana-oss:latest
-    pull: true
     ports:
       - 3000:3000/tcp
     volumes:
