@@ -1,0 +1,41 @@
+---
+dependencies:
+  - role: core/container
+    container_name: tanoshi
+    container_image: faldez/tanoshi:latest
+    container_command:
+      - --config=/config.yaml
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+      - dest: "{{ docker_dir }}/{{ container_name }}/plugins"
+        owner: "{{ guid }}"
+      - dest: "{{ docker_dir }}/{{ container_name }}/cache"
+        owner: "{{ guid }}"
+      - "{{ mergerfs_root }}/Media/Manga"
+      - "{{ mergerfs_root }}/Media/Manga/Manual"
+      - "{{ mergerfs_root }}/Media/Manga/Downloads"
+    container_networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    container_templates:
+      - src: config.yaml.j2
+        dest: "{{ docker_dir }}/{{ container_name }}/config.yaml"
+        owner: "{{ guid }}"
+    container_user: "{{ guid }}:{{ default_group.id }}"
+    container_envs:
+      PORT: "{{ tanoshi_port | string }}"
+      TANOSHI_HOME: "{{ tanoshi_home_path }}"
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}/config.yaml:/config.yaml:ro"
+      - "{{ docker_dir }}/{{ container_name }}:{{ tanoshi_home_path }}:rw"
+      - "{{ mergerfs_root }}/Media/Manga/Manual:{{ tanoshi_manga_path }}:rw"
+      - "{{ mergerfs_root }}/Media/Manga/Downloads:{{ tanoshi_downloads_path }}:rw"
+    container_labels: |
+      {
+        "traefik.enable": "true",
+        "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "{{ tanoshi_port }}",
+      }

@@ -1,0 +1,17 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{{ ansible_managed | comment }}
+# https://faldez.github.io/tanoshi/guide
+---
+base_url: ~
+port: {{ tanoshi_port }}
+database_path: {{ tanoshi_home_path }}/tanoshi.db
+secret: {{ tanoshi_secret_token }}
+plugin_path: {{ tanoshi_home_path }}/plugins
+local_path: {{ tanoshi_manga_path }}
+download_path: {{ tanoshi_downloads_path }}
+update_interval: 3600
+auto_download_chapters: true
+enable_playground: false
+telegram:
+  name: {{ telegram_bot_name }}
+  token: {{ telegram_token }}

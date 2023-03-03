@@ -1,0 +1,12 @@
+---
+url: "tanoshi.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.28"
+
+tanoshi_port: 8080
+tanoshi_home_path: /tanoshi
+tanoshi_manga_path: /manga
+tanoshi_downloads_path: /downloads
+
+dashboard_name: Tanoshi
+dashboard_category: media
+dashboard_subtitle: Self-hosted web manga reader
