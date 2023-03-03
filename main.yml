@@ -183,6 +183,31 @@
         - sonarr
         - apps/media
       when: inventory_hostname in groups["home"]
+    - role: apps/media/lazylibrarian
+      tags:
+        - lazylibrarian
+        - apps/media
+      when: inventory_hostname in groups["home"]
+    - role: apps/media/mango
+      tags:
+        - mango
+        - apps/media
+      when: inventory_hostname in groups["home"]
+    - role: apps/media/tanoshi
+      tags:
+        - tanoshi
+        - apps/media
+      when: inventory_hostname in groups["home"]
+    - role: apps/media/komga
+      tags:
+        - komga
+        - apps/media
+      when: inventory_hostname in groups["home"]
+    - role: apps/media/kavita
+      tags:
+        - kavita
+        - apps/media
+      when: inventory_hostname in groups["home"]
     #
     # Dashboard
     #
