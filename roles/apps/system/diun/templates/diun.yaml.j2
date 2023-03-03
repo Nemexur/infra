@@ -9,9 +9,9 @@ watch:
   schedule: {{ diun_watch_schedule | quote }}
 notif:
   telegram:
-    token: {{ diun_telegram_token }}
+    token: {{ telegram_token }}
     chatIDs:
-      {{ diun_telegram_chatids | to_nice_yaml(indent=6) | indent(6, False) }}
+      {{ telegram_chatids | to_nice_yaml(indent=6) | indent(6, False) }}
 providers:
   docker:
     watchStopped: false

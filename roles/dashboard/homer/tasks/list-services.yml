@@ -31,9 +31,9 @@
   ansible.builtin.set_fact:
     web_applications: >-
       {{ web_applications | default([]) +
-      [{'logo': 'assets/tools/homer-icons/' + item.path.split('/')[-1] + '.png',
-      'name': lookup('vars', item.path.split('/')[-1])['dashboard_name'] | default(item.path.split('/')[-1] | title),
-      'url' : 'https://' + (lookup('vars', item.path.split('/')[-1])['url'] | default('')),
-      'subtitle' : lookup('vars', item.path.split('/')[-1])['dashboard_subtitle'] | default(''),
-      'category': lookup('vars', item.path.split('/')[-1])['dashboard_category'] | default ('')}] }}
-  loop: "{{ infra_containers.files }}"
+      [{'logo': 'assets/tools/homer-icons/' + item.split('/')[-1] + '.png',
+      'name': lookup('vars', item.split('/')[-1])['dashboard_name'] | default(item.split('/')[-1] | title),
+      'url' : 'https://' + (lookup('vars', item.split('/')[-1])['url'] | default('')),
+      'subtitle' : lookup('vars', item.split('/')[-1])['dashboard_subtitle'] | default(''),
+      'category': lookup('vars', item.split('/')[-1])['dashboard_category'] | default ('')}] }}
+  loop: "{{ infra_containers.files | map(attribute='path') }}"
