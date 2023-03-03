@@ -1,0 +1,7 @@
+---
+url: "lazylibrarian.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.27"
+
+dashboard_name: Lazylibrarian
+dashboard_category: media
+dashboard_subtitle: Follow authors and grab metadata for all your digital reading needs
