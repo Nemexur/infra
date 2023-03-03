@@ -1,0 +1,24 @@
+---
+dependencies:
+  - role: core/container
+    container_name: kavita
+    container_image: kizaing/kavita:latest
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+      - "{{ mergerfs_root }}/Media/Manga"
+    container_networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    container_user: "{{ guid }}:{{ default_group.id }}"
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/kavita/config"
+      - "{{ mergerfs_root }}/Media/Manga:/manga"
+    container_labels: |
+      {
+        "traefik.enable": "true",
+        "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "5000",
+      }
