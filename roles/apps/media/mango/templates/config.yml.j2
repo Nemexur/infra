@@ -1,0 +1,25 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{{ ansible_managed | comment }}
+# https://github.com/getmango/Mango/tree/master
+---
+host: 0.0.0.0
+port: 9000
+base_url: /
+session_secret: mango-session-secret
+library_path: /library
+db_path: {{ mango_lib_path }}/mango.db
+queue_db_path: {{ mango_lib_path }}/queue.db
+scan_interval_minutes: 5
+thumbnail_generation_interval_hours: 24
+log_level: info
+upload_path: {{ mango_lib_path }}/uploads
+plugin_path: /plugins
+download_timeout_seconds: 30
+library_cache_path: {{ mango_lib_path }}/library.yml.gz
+cache_enabled: true
+cache_size_mbs: 50
+cache_log_enabled: true
+disable_login: false
+default_username: ""
+auth_proxy_header_name: ""
+plugin_update_interval_hours: 24

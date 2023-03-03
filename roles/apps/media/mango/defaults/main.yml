@@ -1,0 +1,12 @@
+---
+container_name: mango
+url: "mango.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.25"
+
+mango_lib_path: /mango
+mango_library_path: /library
+mango_plugins_path: /plugins
+
+dashboard_name: Mango
+dashboard_category: media
+dashboard_subtitle: Mango is a self-hosted manga server and reader

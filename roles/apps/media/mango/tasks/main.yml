@@ -1,0 +1,86 @@
+---
+- name: Ensure required directories are present
+  ansible.builtin.file:
+    dest: "{{ item.dest | default(item) }}"
+    state: directory
+    mode: 0775
+    owner: "{{ item.owner | default(default_owner.name) }}"
+    group: "{{ item.group | default(default_group.name) }}"
+  loop:
+    - dest: "{{ docker_dir }}/{{ container_name }}"
+      owner: "{{ guid }}"
+    - "{{ mergerfs_root }}/Media/Manga"
+
+- name: Ensure mango-plugins are present
+  ansible.builtin.git:
+    repo: https://github.com/getmango/mango-plugins.git
+    dest: "{{ docker_dir }}/{{ container_name }}/mango-plugins"
+    version: master
+    single_branch: true
+    update: true
+
+- name: Find plugin files in mango-plugins
+  register: _mango_plugins
+  ansible.builtin.find:
+    paths: "{{ docker_dir }}/{{ container_name }}/mango-plugins/plugins"
+    recurse: true
+    hidden: false
+    excludes:
+      - "*.md"
+
+- name: Ensure directories for mango-plugins are present
+  ansible.builtin.file:
+    dest: "{{ docker_dir }}/{{ container_name }}{{ item | replace(docker_dir + '/' + container_name + '/mango-plugins', '') | dirname }}"
+    state: directory
+    mode: 0775
+    owner: "{{ guid }}"
+    group: "{{ item.group | default(default_group.name) }}"
+  loop: "{{ _mango_plugins.files | map(attribute='path') }}"
+
+- name: Copy mango-plugins with proper permissions
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ docker_dir }}/{{ container_name }}{{ item | replace(docker_dir + '/' + container_name + '/mango-plugins', '') }}"
+    mode: 0775
+    remote_src: true
+    owner: "{{ guid }}"
+    group: "{{ item.group | default(default_group.name) }}"
+  loop: "{{ _mango_plugins.files | map(attribute='path') }}"
+
+- name: Generate mango config
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: "{{ docker_dir }}/{{ container_name }}/config.yml"
+    mode: 0644
+    owner: "{{ guid }}"
+    group: "{{ default_group.name }}"
+
+- name: "Ensure container is up and running: {{ container_name }}"
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    state: started
+    restart_policy: unless-stopped
+    image: hkalexling/mango:latest
+    user: "{{ guid }}:{{ default_group.id }}"
+    command:
+      - /usr/local/bin/mango
+      - --config=/config.yml
+    networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    volumes:
+      - "{{ docker_dir }}/{{ container_name }}/config.yml:/config.yml:ro"
+      - "{{ docker_dir }}/{{ container_name }}:{{ mango_lib_path }}:rw"
+      - "{{ docker_dir }}/{{ container_name }}/plugins:{{ mango_plugins_path }}:rw"
+      - "{{ mergerfs_root }}/Media/Manga:{{ mango_library_path }}:rw"
+    labels: |
+      {
+        "traefik.enable": "true",
+        "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
+        "traefik.http.routers.{{ container_name }}.tls": "true",
+        "traefik.http.routers.{{ container_name }}.entrypoints": "websecure",
+        "traefik.http.routers.{{ container_name }}.tls.certresolver": "myresolver",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "9000",
+      }
