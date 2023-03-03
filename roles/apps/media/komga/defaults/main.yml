@@ -1,0 +1,7 @@
+---
+url: "komga.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.24"
+
+dashboard_name: Komga
+dashboard_category: media
+dashboard_subtitle: Free and open source comics/mangas media server
