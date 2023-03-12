@@ -7,7 +7,7 @@ dashboard_category: system
 dashboard_subtitle: Networking Stack That Just Works
 
 container_name: traefikdash
-container_image: traefik:v2.9.6
+container_image: traefik:v2.9.8
 container_labels: |
   {
     "traefik.enable": "true",
