@@ -1,0 +1,8 @@
+---
+dependencies:
+  - role: core/container
+    container_name: apcupsd-exporter
+    container_image: jangrewe/apcupsd-exporter:latest
+    container_network_mode: host
+    container_ssl_enabled: false
+    container_labels: {}

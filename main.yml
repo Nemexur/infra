@@ -241,6 +241,11 @@
       tags:
         - cadvisor
         - exporters
+    - role: monitoring/exporters/apcupsd
+      tags:
+        - apcupsd
+        - exporters
+      when: inventory_hostname in groups["home"]
     #
     # Disks monitoring
     #
