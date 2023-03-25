@@ -20,6 +20,8 @@
     dir: "{{ item.path }}/defaults"
     files_matching: main.yml
     name: "{{ item.path.split('/')[-1] }}"
+  loop_control:
+    label: "{{ item.path | default(item) }}"
   loop: "{{ infra_containers.files }}"
 
 - name: Empty the variables (In case the task is called twice)
@@ -36,4 +38,5 @@
       'url' : 'https://' + (lookup('vars', item.split('/')[-1])['url'] | default('')),
       'subtitle' : lookup('vars', item.split('/')[-1])['dashboard_subtitle'] | default(''),
       'category': lookup('vars', item.split('/')[-1])['dashboard_category'] | default ('')}] }}
+  when: lookup('vars', item.split('/')[-1])['dashboard_enabled'] | default(true) | bool
   loop: "{{ infra_containers.files | map(attribute='path') }}"

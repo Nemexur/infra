@@ -10,3 +10,4 @@ mango_plugins_path: /plugins
 dashboard_name: Mango
 dashboard_category: media
 dashboard_subtitle: Mango is a self-hosted manga server and reader
+dashboard_enabled: false

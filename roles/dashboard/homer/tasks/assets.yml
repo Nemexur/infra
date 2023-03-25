@@ -20,6 +20,8 @@
 - name: List the apps with icons
   ansible.builtin.set_fact:
     apps_with_icons: "{{ apps_with_icons | default([]) + [(item.logo | basename).split('.')[0]] }}"
+  loop_control:
+    label: "{{ item.name | default(item) }}"
   loop: "{{ web_applications + (homer_external_applications | default([])) }}"
 
 - name: "Clone theme repo: {{ homer_theme_repo }}"
