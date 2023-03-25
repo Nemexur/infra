@@ -12,9 +12,9 @@ dependencies:
         owner: "{{ guid }}"
       - dest: "{{ docker_dir }}/{{ container_name }}/cache"
         owner: "{{ guid }}"
-      - "{{ mergerfs_root }}/Media/Manga"
-      - "{{ mergerfs_root }}/Media/Manga/Manual"
-      - "{{ mergerfs_root }}/Media/Manga/Downloads"
+      - "{{ mergerfs_root }}/Media/Manga/Tanoshi"
+      - "{{ mergerfs_root }}/Media/Manga/Tanoshi/Manual"
+      - "{{ mergerfs_root }}/Media/Manga/Tanoshi/Downloads"
     container_networks:
       - name: "{{ traefik_internal_network_name }}"
         ipv4_address: "{{ ipv4_address }}"
@@ -31,8 +31,8 @@ dependencies:
     container_volumes:
       - "{{ docker_dir }}/{{ container_name }}/config.yaml:/config.yaml:ro"
       - "{{ docker_dir }}/{{ container_name }}:{{ tanoshi_home_path }}:rw"
-      - "{{ mergerfs_root }}/Media/Manga/Manual:{{ tanoshi_manga_path }}:rw"
-      - "{{ mergerfs_root }}/Media/Manga/Downloads:{{ tanoshi_downloads_path }}:rw"
+      - "{{ mergerfs_root }}/Media/Manga/Tanoshi/Manual:{{ tanoshi_manga_path }}:rw"
+      - "{{ mergerfs_root }}/Media/Manga/Tanoshi/Downloads:{{ tanoshi_downloads_path }}:rw"
     container_labels: |
       {
         "traefik.enable": "true",
