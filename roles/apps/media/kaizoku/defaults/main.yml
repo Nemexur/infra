@@ -1,0 +1,13 @@
+---
+url: "kaizoku.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.29"
+
+kaizoku_port: 3000
+kaizoku_main_path: kaizoku
+kaizoku_db_path: db
+kaizoku_redis_path: redis
+kaizoku_app_path: app
+
+dashboard_name: Kaizoku
+dashboard_category: media
+dashboard_subtitle: Self-hosted manga downloader

@@ -198,6 +198,11 @@
         - tanoshi
         - apps/media
       when: inventory_hostname in groups["home"]
+    - role: apps/media/kaizoku
+      tags:
+        - kaizoku
+        - apps/media
+      when: inventory_hostname in groups["home"]
     - role: apps/media/komga
       tags:
         - komga
