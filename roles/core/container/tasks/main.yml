@@ -3,7 +3,7 @@
   ansible.builtin.file:
     dest: "{{ item.dest | default(item) }}"
     state: directory
-    mode: 0775
+    mode: "{{ item.mode | default('775') }}"
     owner: "{{ item.owner | default(default_owner.name) }}"
     group: "{{ item.group | default(default_group.name) }}"
   loop: "{{ container_directories | default([]) }}"
@@ -35,6 +35,7 @@
     pull: "{{ container_pull | default(false) | bool }}"
     privileged: "{{ container_privileged | default(false) | bool }}"
     command: "{{ container_command | default(omit) }}"
+    healthcheck: "{{ container_healthcheck | default(omit) }}"
     user: "{{ container_user | default(omit) }}"
     network_mode: "{{ container_network_mode | default(omit) }}"
     pid_mode: "{{ container_pid | default(omit) }}"

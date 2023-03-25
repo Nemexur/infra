@@ -1,6 +1,4 @@
 ---
-container_directories: []
-container_templates: []
 container_ssl_labels: |
   {
     "traefik.http.routers.{{ container_name }}.tls": "true",
