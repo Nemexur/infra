@@ -1,13 +1,18 @@
 all: help
 
+.PHONY: help
+#> Display this message and exit
 help:
 	@echo "Commands:"
-	@echo "  \033[00;32msetup\033[0m - prepare for installation."
-	@echo "  \033[00;32mlint\033[0m  - run linting in the code base."
+	@awk 'match($$0, "^#>") { sub(/^#>/, "", $$0); doc=$$0; getline; split($$0, c, ":"); cmd=c[1]; print "  \033[00;32m"cmd"\033[0m"":"doc }' Makefile | column -t -s ":"
 
-setup:
+.PHONY: setup
+#> Install ansible-galaxy collections and roles
+install:
 	ansible-galaxy install --role-file requirements.yml -v
 
+.PHONY: lint
+#> Run linters in the codebase
 lint:
 	@echo "[ \033[00;33mYamllint\033[0m ]"
 	yamllint .

@@ -11,14 +11,10 @@ dependencies:
       - SYS_MODULE
     container_envs:
       WG_HOST: "{{ wireguard_host }}"
-      WG_DEFAULT_DNS: "{{ groups['monitoring'] | first }}"
       WG_PORT: "{{ wireguard_port | quote }}"
+      WG_DEFAULT_DNS: "{{ wireguard_dns }}"
+      WG_DEFAULT_ADDRESS: "{{ wireguard_default_addr }}"
       WG_PERSISTENT_KEEPALIVE: "25"
-      WG_POST_UP: >-
-        iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE;
-        iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT;
-        iptables -A FORWARD -i wg0 -j ACCEPT;
-        iptables -A FORWARD -o wg0 -j ACCEPT
     container_ports:
       - "{{ wireguard_port }}:{{ wireguard_port }}/udp"
       - "51821:51821/tcp"

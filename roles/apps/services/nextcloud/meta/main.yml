@@ -1,0 +1,58 @@
+---
+dependencies:
+  - role: core/container
+    container_name: nextcloud-mariadb
+    container_image:  lscr.io/linuxserver/mariadb:latest
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ nextcloud_main_path }}"
+        owner: "{{ guid }}"
+      - dest: "{{ docker_dir }}/{{ nextcloud_main_path }}/mariadb"
+        owner: "{{ guid }}"
+    container_networks:
+      - name: "{{ traefik_internal_network_name }}"
+        aliases:
+          - "{{ container_name }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+      MYSQL_DATABASE: "{{ nextcloud_mariadb_db }}"
+      MYSQL_USER: "{{ nextcloud_mariadb_user }}"
+      MYSQL_PASSWORD: "{{ nextcloud_mariadb_password }}"
+      MYSQL_ROOT_PASSWORD: "{{ nextcloud_mariadb_root_password }}"
+    container_volumes:
+      - "{{ docker_dir }}/{{ nextcloud_main_path }}/mariadb:/config:rw"
+    container_ssl_enabled: false
+    container_labels: {}
+  - role: core/container
+    container_name: nextcloud
+    container_image: lscr.io/linuxserver/nextcloud:latest
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ nextcloud_main_path }}"
+        owner: "{{ guid }}"
+      - dest: "{{ mergerfs_root }}/Nextcloud"
+        owner: "{{ guid }}"
+    container_networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+      NEXTCLOUD_TRUSTED_DOMAINS: "{{ url }}"
+    container_volumes:
+      - "{{ docker_dir }}/{{ nextcloud_main_path }}/config:/config:rw"
+      - "{{ mergerfs_root }}/Nextcloud:/data:rw"
+      - "{{ mergerfs_root }}/Media:/media:rw"
+      - "{{ mergerfs_root }}/Downloads:/downloads:rw"
+    container_labels: |
+      {
+        "traefik.enable": "true",
+        "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "443",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.scheme": "https",
+        "traefik.http.services.{{ container_name }}.loadbalancer.serverstransport": "ignorecert@file",
+        "traefik.http.routers.{{ container_name }}.middlewares": "chain-nextcloud@file",
+      }

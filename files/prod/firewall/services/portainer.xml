@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>portainer</short>
+  <description>Powerful container management.</description>
+  <port port="9000" protocol="tcp"/>  <!-- HTTP -->
+  <port port="9443" protocol="tcp"/>  <!-- HTTPS -->
+</service>

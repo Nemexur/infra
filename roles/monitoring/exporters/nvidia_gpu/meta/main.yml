@@ -2,7 +2,7 @@
 dependencies:
   - role: core/container
     container_name: nvidia_gpu_exporter
-    container_image: utkuozdemir/nvidia_gpu_exporter:1.1.0
+    container_image: utkuozdemir/nvidia_gpu_exporter:1.2.0
     container_capabilities:
       - SYS_TIME
     container_ports:

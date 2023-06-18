@@ -2,17 +2,21 @@
 dependencies:
   - role: core/container
     container_name: prowlarr
-    container_image: lscr.io/linuxserver/prowlarr:develop
+    container_image: lscr.io/linuxserver/prowlarr:latest
     container_network_mode: "{{ vpn_docker_network }}"
     container_directories:
       - dest: "{{ docker_dir }}/{{ container_name }}"
         owner: "{{ guid }}"
+      - "{{ mergerfs_root }}/Media/Stuff"
+      - "{{ mergerfs_root }}/Downloads/Stuff"
     container_envs:
       PUID: "{{ guid }}"
       PGID: "{{ default_group.id }}"
       TZ: "{{ timezone }}"
     container_volumes:
       - "{{ docker_dir }}/{{ container_name }}:/config"
+      - "{{ mergerfs_root }}/Media/Stuff:/data/media/stuff"
+      - "{{ mergerfs_root }}/Downloads/Stuff:/data/torrents/stuff"
     container_labels: |
       {
         "traefik.enable": "true",

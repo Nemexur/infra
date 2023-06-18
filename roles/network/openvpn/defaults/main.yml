@@ -1,5 +1,0 @@
----
-ipv4_address: "{{ traefik_internal_network_base }}.21"
-
-container_name: open-vpn
-vpn_directory: "{{ lookup('env', 'HOME') + '/open-vpn' }}"

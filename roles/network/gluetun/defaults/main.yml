@@ -1,0 +1,2 @@
+---
+ipv4_address: "{{ traefik_internal_network_base }}.31"

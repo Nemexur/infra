@@ -1,0 +1,9 @@
+---
+url: "nextcloud.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.30"
+
+nextcloud_main_path: nextcloud
+
+dashboard_name: Nextcloud
+dashboard_category: services
+dashboard_subtitle: Gives you access to all your files wherever you are

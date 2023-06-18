@@ -1,0 +1,5 @@
+---
+cloudflared_metrics_port: 8099
+cloudflared_dns_upstream:
+  - https://1.1.1.1/dns-query
+  - https://1.0.0.1/dns-query

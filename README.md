@@ -17,6 +17,9 @@ Also this project helped me to learn a lot about:
 - Cool Ansible tricks
 - Docker Networking
 - DHCP and DNS servers
+- DNS-over-HTTPS/TLS
+- Bridge
+- VLAN
 - Security
 - Firewall
 - VPN
@@ -27,41 +30,43 @@ Also this project helped me to learn a lot about:
 
 ## Description
 
-The playbook is mostly being developed for personal use. It assumes my home setup of 2 **Fedora**-based servers (37 Server):
+The playbook is mostly being developed for personal use.
+It assumes my home setup of 2 **Fedora**-based servers (38 Server):
 
-- `Home` - main server with the cool stuff.
-- `Monitoring` - where to store metrics and logs + networking part.
+- `Alice` - main server with the cool stuff.
+- `Bravo` - handles monitoring and logs.
 
 Everything is deployed as docker containers.
 
 ### Plans
 
 - Add Authelia to public services
-- Use K8s ([k3s](https://k3s.io/)) to manage apps and simplify nodes management
+- Add Mikrotik RouterOS provisioning
 
 ### Applications
 
-All of the values in hierarchy below are tags (**lowercased**) in [main.yml](main.yml). Highlighted words indicate servers the tag is being used with. There are few mistakes in the structure below probably.
+All of the values in hierarchy below are tags (**lowercased**) in [main.yml](main.yml).
+Highlighted words indicate servers the tag is being used with. There are few mistakes in the structure below probably.
 
-- [VPN](https://github.com/WeeJeWel/wg-easy) - setup WireGuard Easy container `Monitoring`.
-- Essential - essential setup like users, groups and powersaving `Home/Monitoring`.
+- [VPN](https://github.com/WeeJeWel/wg-easy) - WireGuard Easy container `Bravo`.
+- Essential - essential setup like users, groups and powersaving `Alice/Bravo`.
   - Packages - install dnf packages.
-- Filesystem - setup filesystem for home server `Home`.
+- Filesystem - setup filesystem `Alice`.
   - [ZFS](https://zfsonlinux.org/) - setup pool and filesystem from SATA disks.
   - [MergerFS](https://github.com/trapexit/mergerfs) - merge separate disks and pools together.
   - [Samba](https://www.samba.org/samba/smbfs/) - setup SMB filesystem.
   - [CRON](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/cron_module.html) - create scheduled jobs.
-- [Docker](https://www.docker.com/) - install and enable docker (optionally nvidia-docker).
-- Apps - available applications in the system `Home`.
+- [Docker](https://www.docker.com/) - install and enable docker (optionally nvidia-docker2).
+- Apps - available applications in the system `Alice`.
   - Network - setup and enable everything related to network.
     - [Traefik](https://traefik.io/) - web proxy and TLS certificates manager.
-    - [OpenVPN](https://openvpn.net/) - containerized OpenVPN client.
+    - [Gluetun](https://github.com/qdm12/gluetun) - VPN client in a thin Docker container for multiple VPN providers, written in Go.
   - Containers - docker containers connected with traefik network.
-    - Containers/System - everything that helps me to monitor and control my Home server.
+    - Containers/System - everything that assists me in monitoring and controlling my services.
       - [cAdvisor](https://github.com/google/cadvisor) - analyzes resource usage and performance characteristics of running containers.
-      - [Watchtower](https://github.com/v2tec/watchtower) - monitor your Docker containers and update them if a new version is available.
       - [Portainer](https://portainer.io/) - easily manage Docker and running containers.
       - [Diun](https://crazymax.dev/diun/) - receive notifications when a Docker image is updated on a Docker registry.
+      - [Uptime Kuma](https://uptime.kuma.pet/) - a fancy self-hosted monitoring tool.
     - Containers/Media - everything to consume my media.
       - [Bazarr](https://github.com/morpheus65535/bazarr) - companion to Radarr and Sonarr for downloading subtitles.
       - [Jackett](https://github.com/Jackett/Jackett) - API Support for your favorite torrent trackers.
@@ -71,10 +76,14 @@ All of the values in hierarchy below are tags (**lowercased**) in [main.yml](mai
       - [Radarr](https://radarr.video/) - for organising and downloading movies.
       - [Readarr](https://readarr.com/) - for organising and downloading books.
       - [Sonarr](https://sonarr.tv/) - for downloading and managing TV episodes.
+      - [Komga](https://komga.org/) - Free and open source comics/mangas media server.
+      - [Tanoshi](https://github.com/faldez/tanoshi) - self-hosted web manga reader/downloader.
+      - [Kaizoku](https://github.com/oae/kaizoku) - self-hosted manga downloader.
+      - [Lazylibrarian](https://lazylibrarian.gitlab.io/) - follow authors and grab metadata for all your digital reading needs.
     - Containers/Services - everything that is not *Containers/Media*.
       - [Pi-Hole](https://pi-hole.net/) - protects your devices from unwanted content.
       - [Transmission](https://transmissionbt.com/) - my favorite BitTorrent client.
-      - [Deluge](https://dev.deluge-torrent.org/) - a lightweight, free software, cross-platform BitTorrent client.
+      - [Nextcloud](https://nextcloud.com/) - on-premise Universal File Access and sync platform.
   - Dashboard - dashboards for my applications.
     - [Homer](https://github.com/bastienwirtz/homer) - a very simple static homepage for your server.
 - Monitoring - more metrics is always better.
@@ -82,6 +91,9 @@ All of the values in hierarchy below are tags (**lowercased**) in [main.yml](mai
   - Exporters - setup and enable metrics exporters for [Prometheus](https://prometheus.io/) `Home/Monitoring`.
     - [Node](https://github.com/prometheus/node_exporter) - exporter for hardware and OS metrics.
     - [Nvidia](https://github.com/utkuozdemir/nvidia_gpu_exporter) - Nvidia GPU exporter for prometheus, using nvidia-smi binary to gather metrics.
+    - [APC UPS](https://github.com/jangrewe/apcupsd_exporter) - exporter for UPS.
+    - [Pi-Hole](https://github.com/eko/pihole-exporter) - exporter for Pi-Hole.
+    - [Mikrotik](https://github.com/akpw/mktxp/tree/main) - exporter for Mikrotik RouterOS devices.
   - [Prometheus](https://prometheus.io/) - an open-source systems monitoring and alerting toolkit `Monitoring`.
   - [Grafana](https://grafana.com/) - an open source analytics & monitoring solution for every database `Monitoring`.
 - [Security](https://github.com/geerlingguy/ansible-role-security) - security measures for my servers `Home/Monitoring`.
@@ -105,7 +117,6 @@ All of the values in hierarchy below are tags (**lowercased**) in [main.yml](mai
 - [ ] Add public network management with Traefik
 - [ ] Add Cloudflare integration for public network
 - [ ] Support Authelia
-- [ ] Add k3s to experimental + create new inventory for it
 
 ### Misc
 
@@ -114,7 +125,7 @@ All of the values in hierarchy below are tags (**lowercased**) in [main.yml](mai
 - [x] Exclude open-vpn from cron docker backup
 - [ ] Better project structure
 - [x] Refactor grafana dashboards management (templating)
-- [ ] Rename home -> alice, monitoring -> bravo
+- [x] Rename home -> alice, monitoring -> bravo
 - [ ] yml -> yaml
 - [ ] Support telegram notifications
 

@@ -11,7 +11,7 @@ notif:
   telegram:
     token: {{ telegram_token }}
     chatIDs:
-      {{ telegram_chatids | to_nice_yaml(indent=6) | indent(6, False) }}
+      - {{ telegram_chatids.docker }}
 providers:
   docker:
     watchStopped: false

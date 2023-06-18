@@ -3,40 +3,34 @@ dependencies:
   - role: core/container
     container_name: kaizoku-redis
     container_image: redis:7-alpine
+    container_network_mode: "{{ vpn_docker_network }}"
     container_directories:
       - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}"
         owner: "{{ guid }}"
-      - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}/{{ kaizoku_redis_path }}"
+      - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}/redis"
         owner: "{{ guid }}"
-    container_networks:
-      - name: "{{ traefik_internal_network_name }}"
-        aliases:
-          - "{{ container_name }}"
     container_user: "{{ guid }}:{{ default_group.id }}"
     container_volumes:
-      - "{{ docker_dir }}/{{ kaizoku_main_path }}/{{ kaizoku_redis_path }}:/data:rw"
+      - "{{ docker_dir }}/{{ kaizoku_main_path }}/redis:/data:rw"
     container_ssl_enabled: false
     container_labels: {}
   - role: core/container
     container_name: kaizoku-db
     container_image: postgres:alpine
+    container_network_mode: "{{ vpn_docker_network }}"
     container_directories:
       - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}"
         owner: "{{ guid }}"
-      - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}/{{ kaizoku_db_path }}"
+      - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}/db"
         owner: "{{ guid }}"
         mode: '700'
-    container_networks:
-      - name: "{{ traefik_internal_network_name }}"
-        aliases:
-          - "{{ container_name }}"
     container_user: "{{ guid }}:{{ default_group.id }}"
     container_envs:
       POSTGRES_USER: kaizoku
       POSTGRES_DB: kaizoku
       POSTGRES_PASSWORD: kaizoku
     container_volumes:
-      - "{{ docker_dir }}/{{ kaizoku_main_path }}/{{ kaizoku_db_path }}:/var/lib/postgresql/data:rw"
+      - "{{ docker_dir }}/{{ kaizoku_main_path }}/db:/var/lib/postgresql/data:rw"
     container_healthcheck:
       test:
         - CMD-SHELL
@@ -46,33 +40,29 @@ dependencies:
   - role: core/container
     container_name: kaizoku-app
     container_image: ghcr.io/oae/kaizoku:latest
+    container_network_mode: "{{ vpn_docker_network }}"
     container_directories:
       - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}"
         owner: "{{ guid }}"
-      - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}/{{ kaizoku_app_path }}"
+      - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}/app"
         owner: "{{ guid }}"
-      - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}/{{ kaizoku_app_path }}/logs"
+      - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}/app/logs"
         owner: "{{ guid }}"
-      - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}/{{ kaizoku_app_path }}/config"
+      - dest: "{{ docker_dir }}/{{ kaizoku_main_path }}/app/config"
         owner: "{{ guid }}"
       - "{{ mergerfs_root }}/Media/Manga/Kaizoku"
-    container_networks:
-      - name: "{{ traefik_internal_network_name }}"
-        ipv4_address: "{{ ipv4_address }}"
-        aliases:
-          - "{{ container_name }}"
     container_envs:
       PUID: "{{ guid }}"
       PGID: "{{ default_group.id }}"
       TZ: "{{ timezone }}"
-      REDIS_HOST: kaizoku-redis
+      REDIS_HOST: localhost
       REDIS_PORT: "6379"
       KAIZOKU_PORT: "{{ kaizoku_port | string }}"
-      DATABASE_URL: postgresql://kaizoku:kaizoku@kaizoku-db:5432/kaizoku
+      DATABASE_URL: postgresql://kaizoku:kaizoku@localhost:5432/kaizoku
     container_volumes:
       - "{{ mergerfs_root }}/Media/Manga/Kaizoku:/data:rw"
-      - "{{ docker_dir }}/{{ kaizoku_main_path }}/{{ kaizoku_app_path }}/logs:/logs:rw"
-      - "{{ docker_dir }}/{{ kaizoku_main_path }}/{{ kaizoku_app_path }}/config:/config:rw"
+      - "{{ docker_dir }}/{{ kaizoku_main_path }}/app/logs:/logs:rw"
+      - "{{ docker_dir }}/{{ kaizoku_main_path }}/app/config:/config:rw"
     container_labels: |
       {
         "traefik.enable": "true",

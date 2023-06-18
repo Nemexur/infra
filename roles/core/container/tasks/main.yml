@@ -2,7 +2,7 @@
 - name: "Ensure required directories are present for {{ container_name }}"
   ansible.builtin.file:
     dest: "{{ item.dest | default(item) }}"
-    state: directory
+    state: "{{ item.state | default('directory') }}"
     mode: "{{ item.mode | default('775') }}"
     owner: "{{ item.owner | default(default_owner.name) }}"
     group: "{{ item.group | default(default_group.name) }}"

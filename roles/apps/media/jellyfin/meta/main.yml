@@ -12,6 +12,7 @@ dependencies:
       - "{{ mergerfs_root }}/Media/TV"
       - "{{ mergerfs_root }}/Media/Metadata"
       - "{{ mergerfs_root }}/Media/Cache"
+      - "{{ mergerfs_root }}/Media/Streams"
     container_networks:
       - name: "{{ traefik_internal_network_name }}"
         ipv4_address: "{{ ipv4_address }}"
@@ -30,12 +31,13 @@ dependencies:
     container_devices:
       - /dev/dri:/dev/dri
     container_volumes:
-      - "{{ docker_dir }}/{{ container_name }}:/config"
-      - "{{ mergerfs_root }}/Media/Movies:/movies"
-      - "{{ mergerfs_root }}/Media/TV:/tv"
-      - "{{ mergerfs_root }}/Media/Metadata:/metadata"
-      - "{{ mergerfs_root }}/Media/Cache:/data/Cache"
-      - "{{ mergerfs_root }}/Media/Transcodes:/config/data/transcodes"
+      - "{{ docker_dir }}/{{ container_name }}:/config:rw"
+      - "{{ mergerfs_root }}/Media/Movies:/movies:rw"
+      - "{{ mergerfs_root }}/Media/TV:/tv:rw"
+      - "{{ mergerfs_root }}/Media/Metadata:/metadata:rw"
+      - "{{ mergerfs_root }}/Media/Cache:/data/Cache:rw"
+      - "{{ mergerfs_root }}/Media/Streams:/streams:rw"
+      - "{{ mergerfs_root }}/Media/Transcodes:/config/data/transcodes:rw"
     container_labels: |
       {
         "traefik.enable": "true",

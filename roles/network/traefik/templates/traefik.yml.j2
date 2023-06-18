@@ -3,7 +3,6 @@ log:
   level: DEBUG
 
 api:
-  insecure: true
   dashboard: true
 
 entryPoints:
@@ -19,6 +18,13 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
+    http:
+      tls:
+        certResolver: myresolver
+        domains:
+          - main: {{ duckdns_domain }}
+            sans:
+              - "*.{{ duckdns_domain }}"
 
 certificatesResolvers:
   myresolver:
@@ -28,6 +34,11 @@ certificatesResolvers:
       # caserver: https://acme-staging-v02.api.letsencrypt.org/directory"
       dnsChallenge:
         provider: duckdns
+        delayBeforeCheck: 10
+        resolvers:
+          - "{{ lan_hosts.router }}:53"
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
 {% endif %}
 
 providers:

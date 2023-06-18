@@ -53,7 +53,7 @@
         - network
 
 - name: Configure filesystem and shares
-  hosts: home
+  hosts: alice
   become: true
   tags: filesystem
 
@@ -86,35 +86,32 @@
     #
     # Network
     #
-    - role: network/letsencrypt
-      tags:
-        - letsencrypt
-        - duskdns
-        - network
-      when:
-        - inventory_hostname in groups["monitoring"]
-        - letsencrypt_enabled | default(false) | bool
     - role: network/traefik
       tags:
         - traefik
         - network
       when:
-        - inventory_hostname in groups["home"]
+        - inventory_hostname == lan_hosts.alice
         - traefik_enabled | default(false) | bool
-    - role: network/openvpn
+    - role: network/gluetun
       tags:
-        - open-vpn
+        - gluetun
         - network
       when:
-        - inventory_hostname in groups["home"]
+        - inventory_hostname == lan_hosts.alice
         - vpn_docker_network_enabled | default(false) | bool
     - role: network/wireguard
       tags:
         - wireguard
         - network
       when:
-        - inventory_hostname in groups["monitoring"]
+        - inventory_hostname == lan_hosts.bravo
         - vpn_enabled | default(false) | bool
+    - role: network/twingate
+      tags:
+        - twingate
+        - network
+      when: twingate_enabled | default(false) | bool
     #
     # Apps/System
     #
@@ -130,16 +127,16 @@
     #
     # Apps/Services
     #
-    - role: apps/services/pihole
-      tags:
-        - pihole
-        - apps/services
-      when: inventory_hostname in groups["monitoring"]
     - role: apps/services/transmission
       tags:
         - transmission
         - apps/services
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
+    - role: apps/services/nextcloud
+      tags:
+        - nextcloud
+        - apps/services
+      when: inventory_hostname == lan_hosts.alice
     #
     # Apps/Media
     #
@@ -147,72 +144,67 @@
       tags:
         - bazarr
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/jackett
       tags:
         - jackett
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/jellyfin
       tags:
         - jellyfin
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/plex
       tags:
         - plex
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/prowlarr
       tags:
         - prowlarr
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/radarr
       tags:
         - radarr
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/readarr
       tags:
         - readarr
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/sonarr
       tags:
         - sonarr
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/lazylibrarian
       tags:
         - lazylibrarian
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/mango
       tags:
         - mango
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/tanoshi
       tags:
         - tanoshi
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/kaizoku
       tags:
         - kaizoku
         - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/media/komga
       tags:
         - komga
         - apps/media
-      when: inventory_hostname in groups["home"]
-    - role: apps/media/kavita
-      tags:
-        - kavita
-        - apps/media
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
     #
     # Dashboard
     #
@@ -221,7 +213,7 @@
         - homer
         - dashboard
       when:
-        - inventory_hostname in groups["home"]
+        - inventory_hostname == lan_hosts.alice
         - dashboard_enabled | default(false) | bool
 
 - name: Setup metric exporters
@@ -250,7 +242,22 @@
       tags:
         - apcupsd
         - exporters
-      when: inventory_hostname in groups["home"]
+      when: inventory_hostname == lan_hosts.alice
+    - role: monitoring/exporters/mikrotik
+      tags:
+        - mikrotik
+        - exporters
+      when: inventory_hostname == lan_hosts.bravo
+    - role: monitoring/exporters/pihole
+      tags:
+        - pihole
+        - exporters
+      when: inventory_hostname == lan_hosts.bravo
+    - role: monitoring/exporters/exportarr
+      tags:
+        - exportarr
+        - exporters
+      when: inventory_hostname == lan_hosts.bravo
     #
     # Disks monitoring
     #
@@ -259,18 +266,18 @@
         - smart
         - monitoring
       when:
-        - inventory_hostname in groups["home"]
+        - inventory_hostname == lan_hosts.alice
         - smart_monitoring_enabled | default(false) | bool
     - role: stuvusit.smartd
       tags:
         - smart
         - monitoring
       when:
-        - inventory_hostname in groups["home"]
+        - inventory_hostname == lan_hosts.alice
         - smart_monitoring_enabled | default(false) | bool
 
 - name: Setup monitoring system
-  hosts: monitoring
+  hosts: bravo
   become: true
   tags: monitoring
 

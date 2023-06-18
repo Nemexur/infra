@@ -1,0 +1,33 @@
+---
+dependencies:
+  - role: core/container
+    container_name: gluetun
+    container_image: qmcgaw/gluetun:latest
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+    container_capabilities:
+      - NET_ADMIN
+    container_networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+      VPN_SERVICE_PROVIDER: custom
+      VPN_TYPE: wireguard
+      VPN_ENDPOINT_IP: "{{ gluetun_wireguard_endpoint_ip }}"
+      VPN_ENDPOINT_PORT: "{{ gluetun_wireguard_endpoint_port }}"
+      WIREGUARD_PUBLIC_KEY: "{{ gluetun_wireguard_public_key }}"
+      WIREGUARD_PRIVATE_KEY: "{{ gluetun_wireguard_private_key }}"
+      WIREGUARD_PRESHARED_KEY: "{{ gluetun_wireguard_preshared_key }}"
+      WIREGUARD_ADDRESSES: "{{ gluetun_wireguard_addresses }}"
+      DNS_ADDRESS: "{{ gluetun_wireguard_dns_address }}"
+    container_volumes:
+      - /dev/net/tun:/dev/net/tun
+      - "{{ docker_dir }}/{{ container_name }}:/gluetun:rw"
+    container_ssl_enabled: false
+    container_labels: {}

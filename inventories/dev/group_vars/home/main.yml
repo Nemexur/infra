@@ -10,7 +10,7 @@ docker_dir: /opt/docker/data
 hostname: "{{ inventory_hostname }}"
 github_token: "{{ lookup('env', 'github_token') }}"
 ssh_public_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
-vpn_docker_network: "{{ vpn_docker_network_enabled | ternary('container:open-vpn', 'default') }}"
+vpn_docker_network: "{{ vpn_docker_network_enabled | ternary('container:gluetun', 'default') }}"
 #
 # system/users
 #
@@ -126,7 +126,7 @@ cron_jobs:
     minute: 10
     hour: "*/2"
     job:
-      - !unsafe docker stop $(docker ps --format "{{ .ID }} {{ .Names }}" | awk '$2 != "open-vpn" { print $1 }')
+      - !unsafe docker stop $(docker ps --format "{{ .ID }} {{ .Names }}" | awk '$2 != "gluetun" { print $1 }')
       - rsync -avz --delete --exclude cache {{ docker_dir }} {{ mergerfs_root }}/docker-data
       - docker start $(docker ps -a -q)
 #

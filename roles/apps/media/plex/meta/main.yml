@@ -8,6 +8,7 @@ dependencies:
         owner: "{{ guid }}"
       - "{{ mergerfs_root }}/Media/Movies"
       - "{{ mergerfs_root }}/Media/TV"
+      - "{{ mergerfs_root }}/Media/Streams"
     container_network_mode: host
     container_runtime: "{{ nvidia_docker_enabled | default(false) | bool | ternary('nvidia', 'runc') }}"
     container_envs:
@@ -19,8 +20,9 @@ dependencies:
     container_devices:
       - /dev/dri:/dev/dri
     container_volumes:
-      - "{{ docker_dir }}/{{ container_name }}:/config"
-      - "{{ mergerfs_root }}/Media/Movies:/movies"
-      - "{{ mergerfs_root }}/Media/TV:/tv"
+      - "{{ docker_dir }}/{{ container_name }}:/config:rw"
+      - "{{ mergerfs_root }}/Media/Movies:/movies:rw"
+      - "{{ mergerfs_root }}/Media/TV:/tv:rw"
+      - "{{ mergerfs_root }}/Media/Streams:/streams:rw"
     container_ssl_enabled: false
     container_labels: {}

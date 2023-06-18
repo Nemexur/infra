@@ -1,0 +1,16 @@
+---
+dependencies:
+  - role: core/container
+    container_name: cloudflared
+    container_image: cloudflare/cloudflared:latest
+    container_command:
+      - proxy-dns
+      - "--metrics=0.0.0.0:{{ cloudflared_metrics_port }}"
+    container_network_mode: host
+    container_user: "{{ guid }}:{{ default_group.id }}"
+    container_envs:
+      TUNNEL_DNS_UPSTREAM: "{{ cloudflared_dns_upstream | join(',') }}"
+      TUNNEL_DNS_PORT: "5053"
+      TUNNEL_DNS_ADDRESS: 0.0.0.0
+    container_ssl_enabled: false
+    container_labels: {}

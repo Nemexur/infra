@@ -1,0 +1,24 @@
+---
+dependencies:
+  - role: core/container
+    container_name: mikrotik-exporter
+    container_image: ghcr.io/akpw/mktxp:latest
+    container_command:
+      - --cfg-dir=/mktxp
+      - export
+    container_network_mode: host
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+    container_templates:
+      - src: _mktxp.conf.j2
+        dest: "{{ docker_dir }}/{{ container_name }}/_mktxp.conf"
+        owner: "{{ guid }}"
+      - src: mktxp.conf.j2
+        dest: "{{ docker_dir }}/{{ container_name }}/mktxp.conf"
+        owner: "{{ guid }}"
+    container_user: "{{ guid }}:{{ default_group.id }}"
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/mktxp"
+    container_ssl_enabled: false
+    container_labels: {}

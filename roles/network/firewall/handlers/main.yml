@@ -2,6 +2,7 @@
 - name: reload firewalld
   ansible.builtin.command:
     cmd: firewall-cmd --reload
+  changed_when: false
   check_mode: false
 
 - name: sleep 10 seconds

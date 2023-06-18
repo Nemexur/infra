@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>exporters</short>
+  <description>Metric exporters for my monitoring setup</description>
+  <port protocol="tcp" port="9100"/>  <!-- Node Exporter -->
+  <port protocol="tcp" port="9162"/>  <!-- ApcUPS Exporter -->
+  <port protocol="tcp" port="9835"/>  <!-- Nvidie GPU Exporter -->
+  <port protocol="tcp" port="8081"/>  <!-- Docker Containers Exporter -->
+</service>

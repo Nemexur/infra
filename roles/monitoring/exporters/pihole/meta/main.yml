@@ -1,0 +1,15 @@
+---
+dependencies:
+  - role: core/container
+    container_name: pihole-exporter
+    container_image: ekofr/pihole-exporter:latest
+    container_ports:
+      - 9617:9617/tcp
+    container_envs:
+      PIHOLE_HOSTNAME: "{{ lan_hosts.router }}"
+      PIHOLE_PASSWORD: "{{ pihole_password }}"
+      PIHOLE_PORT: "{{ pihole_port | quote }}"
+      PORT: "9617"
+    container_user: "{{ guid }}:{{ default_group.id }}"
+    container_ssl_enabled: false
+    container_labels: {}

@@ -1,5 +1,6 @@
 ---
 engine_docker_url: https://download.docker.com/linux/fedora/docker-ce.repo
+engine_docker_tcp_port: 2375
 engine_docker_packages:
   - docker-ce
   - docker-ce-cli

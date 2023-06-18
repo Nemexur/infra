@@ -44,6 +44,5 @@
     dest: "{{ docker_dir }}"
     state: directory
     mode: 0775
-    owner: "{{ default_owner.name }}"
+    owner: "{{ guid }}"
     group: "{{ default_group.name }}"
-    recurse: true

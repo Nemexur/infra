@@ -1,10 +1,12 @@
 ---
 http:
+  serversTransports:
+    ignorecert:
+      insecureSkipVerify: true
   routers:
     grafana:
       rule: "Host(`grafana.{{ host_local }}`)"
       service: grafana-service
-      priority: 1000
       tls:
         certresolver: myresolver
       entryPoints:
@@ -12,7 +14,13 @@ http:
     pihole:
       rule: "Host(`pihole.{{ host_local }}`)"
       service: pihole-service
-      priority: 1000
+      tls:
+        certresolver: myresolver
+      entryPoints:
+        - websecure
+    uptime-kuma:
+      rule: "Host(`uptime-kuma.{{ host_local }}`)"
+      service: uptime-kuma-service
       tls:
         certresolver: myresolver
       entryPoints:
@@ -20,7 +28,6 @@ http:
     plex:
       rule: "Host(`plex.{{ host_local }}`)"
       service: plex-service
-      priority: 1000
       tls:
         certresolver: myresolver
       entryPoints:
@@ -28,7 +35,6 @@ http:
     portainer-alice:
       rule: "Host(`portainer-alice.{{ host_local }}`)"
       service: portainer-alice-service
-      priority: 1000
       tls:
         certresolver: myresolver
       entryPoints:
@@ -36,7 +42,6 @@ http:
     portainer-bravo:
       rule: "Host(`portainer-bravo.{{ host_local }}`)"
       service: portainer-bravo-service
-      priority: 1000
       tls:
         certresolver: myresolver
       entryPoints:
@@ -44,34 +49,63 @@ http:
     wireguard-ui:
       rule: "Host(`wireguard-ui.{{ host_local }}`)"
       service: wireguard-ui-service
-      priority: 1000
       tls:
         certresolver: myresolver
       entryPoints:
         - websecure
-
   services:
     grafana-service:
       loadBalancer:
         servers:
-          - url: "http://{{ groups['monitoring'] | first }}:3000"
+          - url: "http://{{ lan_hosts.bravo }}:3000"
     wireguard-ui-service:
       loadBalancer:
         servers:
-          - url: "http://{{ groups['monitoring'] | first }}:51821"
+          - url: "http://{{ lan_hosts.bravo }}:51821"
     portainer-bravo-service:
       loadBalancer:
         servers:
-          - url: "http://{{ groups['monitoring'] | first }}:9000"
+          - url: "http://{{ lan_hosts.bravo }}:9000"
     pihole-service:
       loadBalancer:
         servers:
-          - url: "http://{{ groups['monitoring'] | first }}:{{ pihole_web_port }}"
+          - url: "http://{{ lan_hosts.router }}:8080"
+    uptime-kuma-service:
+      loadBalancer:
+        servers:
+          - url: "http://{{ lan_hosts.router }}:3001"
     plex-service:
       loadBalancer:
         servers:
-          - url: "http://{{ groups['home'] | first }}:32400"
+          - url: "http://{{ lan_hosts.alice }}:32400"
     portainer-alice-service:
       loadBalancer:
         servers:
-          - url: "http://{{ groups['home'] | first }}:9000"
+          - url: "http://{{ lan_hosts.alice }}:9000"
+  middlewares:
+    nextcloud-middlewares-secure-headers:
+      headers:
+        accessControlMaxAge: 100
+        hostsProxyHeaders: ["X-Forwarded-Host"]
+        sslRedirect: true
+        stsSeconds: 63072000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+        customFrameOptionsValue: "SAMEORIGIN"
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "same-origin"
+        permissionsPolicy: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), vr=()"
+        customResponseHeaders:
+          X-Robots-Tag: "none"
+          server: ""
+    nextcloud-redirect:
+      redirectRegex:
+        permanent: true
+        regex: "https://(.*)/.well-known/(card|cal)dav"
+    chain-nextcloud:
+      chain:
+        middlewares:
+          - nextcloud-middlewares-secure-headers
+          - nextcloud-redirect

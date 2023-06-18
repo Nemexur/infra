@@ -20,6 +20,35 @@
   loop: "{{ engine_docker_packages }}"
   notify: restart docker
 
+- name: Ensure docker folders exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  loop:
+    - /etc/docker
+    - /etc/systemd/system/docker.service.d
+
+- name: Copy docker daemon template
+  ansible.builtin.template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart docker
+
+- name: Copy docker systemd override conf
+  ansible.builtin.copy:
+    src: override.conf
+    dest: /etc/systemd/system/docker.service.d/override.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart docker
+
 - name: Ensure docker is started and enabled on boot
   ansible.builtin.systemd:
     name: docker

@@ -1,6 +1,8 @@
 ---
 - name: netplan apply
-  ansible.builtin.command: netplan apply
+  ansible.builtin.command:
+    cmd: netplan apply
+  changed_when: false
 
 - name: remove default user
   ansible.builtin.user:

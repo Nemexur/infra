@@ -11,8 +11,10 @@ dependencies:
     container_templates:
       - src: diun.yaml.j2
         dest: "{{ docker_dir }}/{{ container_name }}/config/diun.yaml"
+        owner: "{{ guid }}"
+    container_user: "{{ default_owner.id }}:{{ default_group.id }}"
     container_envs:
-      TS: "{{ timezone }}"
+      TZ: "{{ timezone }}"
       LOG_LEVEL: info
       LOG_JSON: "false"
     container_volumes:

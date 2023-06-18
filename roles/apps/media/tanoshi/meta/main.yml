@@ -3,6 +3,7 @@ dependencies:
   - role: core/container
     container_name: tanoshi
     container_image: faldez/tanoshi:latest
+    container_network_mode: "{{ vpn_docker_network }}"
     container_command:
       - --config=/config.yaml
     container_directories:
@@ -15,11 +16,6 @@ dependencies:
       - "{{ mergerfs_root }}/Media/Manga/Tanoshi"
       - "{{ mergerfs_root }}/Media/Manga/Tanoshi/Manual"
       - "{{ mergerfs_root }}/Media/Manga/Tanoshi/Downloads"
-    container_networks:
-      - name: "{{ traefik_internal_network_name }}"
-        ipv4_address: "{{ ipv4_address }}"
-        aliases:
-          - "{{ container_name }}"
     container_templates:
       - src: config.yaml.j2
         dest: "{{ docker_dir }}/{{ container_name }}/config.yaml"

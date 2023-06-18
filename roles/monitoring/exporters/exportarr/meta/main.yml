@@ -1,0 +1,58 @@
+---
+dependencies:
+  - role: core/container
+    container_name: sonarr-exporter
+    container_image: ghcr.io/onedr0p/exportarr:latest
+    container_command: sonarr
+    container_envs:
+      PORT: "9707"
+      URL: "https://sonarr.{{ host_local }}"
+      APIKEY: "{{ arr_tokens.sonarr }}"
+      ENABLE_ADDITIONAL_METRICS: "true"
+    container_ports:
+      - 9707:9707/tcp
+    container_user: "{{ guid }}:{{ default_group.id }}"
+    container_ssl_enabled: false
+    container_labels: {}
+  - role: core/container
+    container_name: radarr-exporter
+    container_image: ghcr.io/onedr0p/exportarr:latest
+    container_command: radarr
+    container_envs:
+      PORT: "9708"
+      URL: "https://radarr.{{ host_local }}"
+      APIKEY: "{{ arr_tokens.radarr }}"
+      ENABLE_ADDITIONAL_METRICS: "true"
+    container_ports:
+      - 9708:9708/tcp
+    container_user: "{{ guid }}:{{ default_group.id }}"
+    container_ssl_enabled: false
+    container_labels: {}
+  - role: core/container
+    container_name: prowlarr-exporter
+    container_image: ghcr.io/onedr0p/exportarr:latest
+    container_command: prowlarr
+    container_envs:
+      PORT: "9710"
+      URL: "https://prowlarr.{{ host_local }}"
+      APIKEY: "{{ arr_tokens.prowlarr }}"
+      ENABLE_ADDITIONAL_METRICS: "true"
+    container_ports:
+      - 9710:9710/tcp
+    container_user: "{{ guid }}:{{ default_group.id }}"
+    container_ssl_enabled: false
+    container_labels: {}
+  - role: core/container
+    container_name: readarr-exporter
+    container_image: ghcr.io/onedr0p/exportarr:latest
+    container_command: readarr
+    container_envs:
+      PORT: "9711"
+      URL: "https://readarr.{{ host_local }}"
+      APIKEY: "{{ arr_tokens.readarr }}"
+      ENABLE_ADDITIONAL_METRICS: "true"
+    container_ports:
+      - 9711:9711/tcp
+    container_user: "{{ guid }}:{{ default_group.id }}"
+    container_ssl_enabled: false
+    container_labels: {}
