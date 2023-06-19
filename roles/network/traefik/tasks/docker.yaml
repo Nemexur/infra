@@ -12,14 +12,14 @@
 
 - name: Copy static configuration
   ansible.builtin.template:
-    src: traefik.yml.j2
+    src: traefik.yaml.j2
     dest: "{{ docker_dir }}/{{ container_name }}/traefik.yml"
     mode: 0644
   register: traefik_static_config
 
 - name: Generate dynamic configuration
   ansible.builtin.template:
-    src: dynamic.yml.j2
+    src: dynamic.yaml.j2
     dest: "{{ docker_dir }}/{{ container_name }}/configurations/dynamic.yml"
     mode: 0644
   register: traefik_dynamic_config

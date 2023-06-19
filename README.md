@@ -114,8 +114,6 @@ Highlighted words indicate servers the tag is being used with. There are few mis
 - [x] Create universal role to run docker containers
 - [x] Create a new role to manage users and groups
 - [x] Better filesystem management
-- [ ] Add public network management with Traefik
-- [ ] Add Cloudflare integration for public network
 - [ ] Support Authelia
 
 ### Misc
@@ -126,8 +124,8 @@ Highlighted words indicate servers the tag is being used with. There are few mis
 - [ ] Better project structure
 - [x] Refactor grafana dashboards management (templating)
 - [x] Rename home -> alice, monitoring -> bravo
-- [ ] yml -> yaml
-- [ ] Support telegram notifications
+- [x] yml -> yaml
+- [x] Support telegram notifications
 
 ### Useful
 

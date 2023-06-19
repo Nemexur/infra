@@ -9,7 +9,7 @@ help:
 .PHONY: setup
 #> Install ansible-galaxy collections and roles
 install:
-	ansible-galaxy install --role-file requirements.yml -v
+	ansible-galaxy install --role-file requirements.yaml -v
 
 .PHONY: lint
 #> Run linters in the codebase

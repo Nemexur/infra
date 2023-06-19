@@ -15,10 +15,10 @@
     recurse: false
   register: infra_containers
 
-- name: Include all defaults/main.yml files
+- name: Include all defaults/main.yaml files
   ansible.builtin.include_vars:
     dir: "{{ item.path }}/defaults"
-    files_matching: main.yml
+    files_matching: main.yaml
     name: "{{ item.path.split('/')[-1] }}"
   loop_control:
     label: "{{ item.path | default(item) }}"

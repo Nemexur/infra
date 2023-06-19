@@ -1,9 +1,9 @@
 ---
 - name: Import docker tasks
-  ansible.builtin.import_tasks: docker.yml
+  ansible.builtin.import_tasks: docker.yaml
 - name: Import datasources tasks
   when: grafana_datasources | length > 0
-  ansible.builtin.import_tasks: datasources.yml
+  ansible.builtin.import_tasks: datasources.yaml
 - name: Import dashboards tasks
   when: grafana_dashboards_dir | length > 0
-  ansible.builtin.import_tasks: dashboards.yml
+  ansible.builtin.import_tasks: dashboards.yaml

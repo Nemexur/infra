@@ -1,7 +1,0 @@
----
-- name: Include check-status tasks
-  ansible.builtin.include_tasks: check-status.yml
-- name: Include networks tasks
-  ansible.builtin.import_tasks: networks.yml
-- name: Include docker tasks
-  ansible.builtin.include_tasks: docker.yml

@@ -49,8 +49,8 @@
 
 - name: Generate mango config
   ansible.builtin.template:
-    src: config.yml.j2
-    dest: "{{ docker_dir }}/{{ container_name }}/config.yml"
+    src: config.yaml.j2
+    dest: "{{ docker_dir }}/{{ container_name }}/config.yaml"
     mode: 0644
     owner: "{{ guid }}"
     group: "{{ default_group.name }}"
@@ -64,14 +64,14 @@
     user: "{{ guid }}:{{ default_group.id }}"
     command:
       - /usr/local/bin/mango
-      - --config=/config.yml
+      - --config=/config.yaml
     networks:
       - name: "{{ traefik_internal_network_name }}"
         ipv4_address: "{{ ipv4_address }}"
         aliases:
           - "{{ container_name }}"
     volumes:
-      - "{{ docker_dir }}/{{ container_name }}/config.yml:/config.yml:ro"
+      - "{{ docker_dir }}/{{ container_name }}/config.yaml:/config.yaml:ro"
       - "{{ docker_dir }}/{{ container_name }}:{{ mango_lib_path }}:rw"
       - "{{ docker_dir }}/{{ container_name }}/plugins:{{ mango_plugins_path }}:rw"
       - "{{ mergerfs_root }}/Media/Manga:{{ mango_library_path }}:rw"

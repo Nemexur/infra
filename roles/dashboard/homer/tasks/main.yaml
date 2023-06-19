@@ -1,0 +1,7 @@
+---
+- name: Import list-services tasks
+  ansible.builtin.import_tasks: list-services.yaml
+- name: Import assets tasks
+  ansible.builtin.import_tasks: assets.yaml
+- name: Import docker tasks
+  ansible.builtin.import_tasks: docker.yaml

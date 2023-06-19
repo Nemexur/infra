@@ -1,7 +1,7 @@
 ---
 - name: Generate homer config file
   ansible.builtin.template:
-    src: config.yml.j2
+    src: config.yaml.j2
     dest: "{{ docker_dir }}/{{ container_name }}/theme/assets/config.yml"
     mode: 0644
     owner: "{{ guid }}"

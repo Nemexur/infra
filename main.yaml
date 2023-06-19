@@ -6,7 +6,7 @@
 
   tasks:
     - name: ssh | import tasks
-      ansible.builtin.import_tasks: tasks/ssh-juggle-port.yml
+      ansible.builtin.import_tasks: tasks/ssh-juggle-port.yaml
 
 - name: Reboot if needed
   hosts: all
@@ -14,7 +14,7 @@
 
   pre_tasks:
     - name: reboot | import tasks
-      ansible.builtin.import_tasks: tasks/reboot-required.yml
+      ansible.builtin.import_tasks: tasks/reboot-required.yaml
 
   roles:
     #
