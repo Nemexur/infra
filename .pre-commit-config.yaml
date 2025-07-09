@@ -1,18 +1,27 @@
 ---
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks.git
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
       - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-json
       - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
       - id: check-toml
-      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: debug-statements
+      - id: destroyed-symlinks
       - id: detect-private-key
-      - id: mixed-line-ending
-      - id: sort-simple-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
       - id: pretty-format-json
         args:
           - --indent=4
+          - --autofix
+          - --no-sort-keys
           - --no-ensure-ascii
       - id: check-added-large-files
         args:
