@@ -20,5 +20,5 @@ dependencies:
       {
         "traefik.enable": "true",
         "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
-        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "8080",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "25600",
       }
