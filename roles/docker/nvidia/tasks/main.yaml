@@ -1,16 +1,11 @@
 ---
-- name: Add nvidia-docker config manager
-  ansible.builtin.command:
-    cmd: "dnf config-manager --add-repo {{ nvidia_docker_url }}"
-    creates: "/etc/yum.repos.d/{{ nvidia_docker_url.split('/')[-1] }}"
+- name: Include RedHat specific tasks
+  ansible.builtin.include_tasks: setup-RedHat.yaml
+  when: ansible_os_family == 'RedHat'
 
-- name: Ensure nvidia packages are present
-  ansible.builtin.dnf:
-    name: "{{ item.name | default(item) }}"
-    state: "{{ item.state | default('present') }}"
-    update_cache: true
-  loop: "{{ nvidia_docker_packages }}"
-  notify: restart systemd docker
+- name: Include Debian specific tasks
+  ansible.builtin.include_tasks: setup-Debian.yaml
+  when: ansible_os_family == 'Debian'
 
 - name: Ensure handlers are notified now
   ansible.builtin.meta: flush_handlers

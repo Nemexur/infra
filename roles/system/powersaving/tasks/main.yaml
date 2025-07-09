@@ -1,10 +1,11 @@
 ---
-- name: Install the powersaving packages
-  ansible.builtin.dnf:
-    name:
-      - powertop
-      - "linux-tools-{{ ansible_kernel }}"
-    state: present
+- name: Include RedHat specific tasks
+  ansible.builtin.include_tasks: setup-RedHat.yaml
+  when: ansible_os_family == 'RedHat'
+
+- name: Include Debian specific tasks
+  ansible.builtin.include_tasks: setup-Debian.yaml
+  when: ansible_os_family == 'Debian'
 
 - name: Install the systemd services
   ansible.builtin.copy:

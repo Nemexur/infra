@@ -1,0 +1,13 @@
+---
+- name: Add nvidia-docker config manager
+  ansible.builtin.command:
+    cmd: "dnf config-manager --add-repo {{ nvidia_docker_url }}"
+    creates: "/etc/yum.repos.d/{{ nvidia_docker_url.split('/')[-1] }}"
+
+- name: Ensure nvidia packages are present
+  ansible.builtin.dnf:
+    name: "{{ item.name | default(item) }}"
+    state: "{{ item.state | default('present') }}"
+    update_cache: true
+  loop: "{{ nvidia_docker_packages }}"
+  notify: restart systemd docker

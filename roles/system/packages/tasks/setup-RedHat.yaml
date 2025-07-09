@@ -1,0 +1,6 @@
+- name: Ensure extra packages are installed
+  ansible.builtin.dnf:
+    name: "{{ item.name | default(item) }}"
+    state: "{{ item.state | default('present') }}"
+    disable_gpg_check: "{{ item.disable_gpg_check | default(false) | bool }}"
+  loop: "{{ system_packages }}"

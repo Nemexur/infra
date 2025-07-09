@@ -1,0 +1,7 @@
+---
+- name: Install the powersaving packages
+  ansible.builtin.dnf:
+    name:
+      - powertop
+      - "linux-tools-{{ ansible_kernel }}"
+    state: present
