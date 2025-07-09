@@ -3,3 +3,4 @@
   ansible.builtin.import_tasks: firewall.yaml
 - name: Import sebooleans tasks
   ansible.builtin.import_tasks: sebooleans.yaml
+  when: ansible_os_family == 'RedHat'
