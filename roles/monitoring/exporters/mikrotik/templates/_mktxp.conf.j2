@@ -3,12 +3,14 @@
 # https://github.com/M0r13n/mikrotik_monitoring
 
 [MKTXP]
-    port = {{ mktxp_port }}
+    listen = 0.0.0.0:{{ mktxp_port }}
     socket_timeout = 2
 
     initial_delay_on_failure = 120
     max_delay_on_failure = 900
     delay_inc_div = 5
+
+    compact_default_conf_values = False
 
     bandwidth = False                  # Turns metrics bandwidth metrics collection on / off
     bandwidth_test_interval = 600      # Interval for colllecting bandwidth metrics
