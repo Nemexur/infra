@@ -1,0 +1,31 @@
+---
+dependencies:
+  - role: core/container
+    container_name: xray-ui
+    container_image: mzz2017/v2raya:latest
+    container_capabilities:
+      - NET_ADMIN
+      - SYS_MODULE
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+    container_networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+      V2RAYA_LOG_FILE: "/tmp/v2raya.log"
+    container_volumes:
+      - /dev/net/tun:/dev/net/tun
+      - "/lib/modules:/lib/modules:ro"
+      - "/etc/resolv.conf:/etc/resolv.conf"
+      - "{{ docker_dir }}/{{ container_name }}:/etc/v2raya:rw"
+    container_labels: |
+      {
+        "traefik.enable": "true",
+        "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "2017",
+      }

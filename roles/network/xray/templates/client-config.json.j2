@@ -1,0 +1,64 @@
+{
+    "log": {
+        "loglevel": "debug"
+    },
+    "routing": {
+        "domainStrategy": "IPIfNonMatch",
+        "rules": [
+            {
+                "type": "field",
+                "port": "0-65535",
+                "sourcePort": "0-65535",
+                "outboundTag": "proxy"
+            },
+            {
+                "type": "field",
+                "ip": [
+                    "geoip:ru",
+                    "geoip:private"
+                ],
+                "outboundTag": "direct"
+            }
+        ]
+    },
+    "outbounds": [
+        {
+            "tag": "proxy",
+            "protocol": "vless",
+            "settings": {
+                "vnext": [
+                    {
+                        "address": "{{ xray_reality_address }}",
+                        "port": {{ xray_reality_port }},
+                        "users": [
+                            {
+                                "id": "{{ xray_reality_user_id }}",
+                                "encryption": "none",
+                                "flow": "xtls-rprx-vision"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "reality",
+                "realitySettings": {
+                    "fingerprint": "chrome",
+                    "serverName": "{{ xray_reality_server_name }}",
+                    "publicKey": "{{ xray_reality_public_key }}",
+                    "spiderX": "",
+                    "shortId": "{{ xray_reality_short_id }}"
+                }
+            }
+        },
+        {
+            "protocol": "freedom",
+            "tag": "direct"
+        },
+        {
+            "protocol": "blackhole",
+            "tag": "block"
+        }
+    ]
+}

@@ -1,0 +1,3 @@
+---
+url: "xray-ui.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.32"
