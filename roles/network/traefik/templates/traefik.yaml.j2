@@ -34,6 +34,7 @@ certificatesResolvers:
       # caserver: https://acme-staging-v02.api.letsencrypt.org/directory"
       dnsChallenge:
         provider: duckdns
+        disablePropagationCheck: true
         delayBeforeCheck: 10
         resolvers:
           - "{{ lan_hosts.router }}:53"
