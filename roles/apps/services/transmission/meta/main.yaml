@@ -2,7 +2,7 @@
 dependencies:
   - role: core/container
     container_name: transmission
-    container_image: lscr.io/linuxserver/transmission:latest
+    container_image: lscr.io/linuxserver/transmission:4.0.6
     container_directories:
       - dest: "{{ docker_dir }}/{{ container_name }}"
         owner: "{{ guid }}"

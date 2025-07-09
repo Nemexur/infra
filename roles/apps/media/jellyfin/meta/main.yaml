@@ -2,7 +2,7 @@
 dependencies:
   - role: core/container
     container_name: jellyfin
-    container_image: lscr.io/linuxserver/jellyfin:latest
+    container_image: lscr.io/linuxserver/jellyfin:10.10.7
     container_directories:
       - dest: "{{ docker_dir }}/{{ container_name }}"
         owner: "{{ guid }}"

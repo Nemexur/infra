@@ -2,7 +2,7 @@
 dependencies:
   - role: core/container
     container_name: sonarr
-    container_image: lscr.io/linuxserver/sonarr:latest
+    container_image: lscr.io/linuxserver/sonarr:4.0.15
     container_network_mode: "{{ vpn_docker_network }}"
     container_directories:
       - dest: "{{ docker_dir }}/{{ container_name }}"

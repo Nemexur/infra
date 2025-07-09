@@ -2,7 +2,7 @@
 dependencies:
   - role: core/container
     container_name: radarr
-    container_image: lscr.io/linuxserver/radarr:latest
+    container_image: lscr.io/linuxserver/radarr:5.26.2
     container_network_mode: "{{ vpn_docker_network }}"
     container_directories:
       - dest: "{{ docker_dir }}/{{ container_name }}"
