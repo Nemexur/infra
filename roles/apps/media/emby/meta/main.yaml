@@ -1,0 +1,46 @@
+---
+dependencies:
+  - role: core/container
+    container_name: emby
+    container_image: lscr.io/linuxserver/emby:4.8.11
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+      - dest: "{{ mergerfs_root }}/Media/Transcodes"
+        owner: "{{ guid }}"
+      - "{{ mergerfs_root }}/Media/Movies"
+      - "{{ mergerfs_root }}/Media/TV"
+      - "{{ mergerfs_root }}/Media/Metadata"
+      - "{{ mergerfs_root }}/Media/Cache"
+      - "{{ mergerfs_root }}/Media/Streams"
+    container_networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    container_runtime: "{{ nvidia_docker_enabled | default(false) | bool | ternary('nvidia', 'runc') }}"
+    container_envs:
+      PUID: "{{ guid }}"
+      PGID: "{{ default_group.id }}"
+      TZ: "{{ timezone }}"
+      VERSION: latest
+      NVIDIA_VISIBLE_DEVICES: all
+    container_ports:
+      - 8096:8096/tcp
+      - 8920:8920/tcp
+    container_devices:
+      - /dev/dri:/dev/dri
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/config:rw"
+      - "{{ mergerfs_root }}/Media/Movies:/data/movies:rw"
+      - "{{ mergerfs_root }}/Media/TV:/data/tvshows:rw"
+      - "{{ mergerfs_root }}/Media/Metadata:/metadata:rw"
+      - "{{ mergerfs_root }}/Media/Cache:/data/Cache:rw"
+      - "{{ mergerfs_root }}/Media/Streams:/data/streams:rw"
+      - "{{ mergerfs_root }}/Media/Transcodes:/config/data/transcodes:rw"
+    container_labels: |
+      {
+        "traefik.enable": "true",
+        "traefik.http.routers.{{ container_name }}.rule": "Host(`{{ url }}`)",
+        "traefik.http.services.{{ container_name }}.loadbalancer.server.port": "8096",
+      }

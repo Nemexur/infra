@@ -1,0 +1,7 @@
+---
+url: "emby.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.33"
+
+dashboard_name: Emby
+dashboard_category: media
+dashboard_subtitle: Media server for personal streaming
