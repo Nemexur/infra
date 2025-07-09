@@ -2,7 +2,7 @@
 dependencies:
   - role: core/container
     container_name: sonarr-exporter
-    container_image: ghcr.io/onedr0p/exportarr:latest
+    container_image: ghcr.io/onedr0p/exportarr:v1.5.0
     container_command: sonarr
     container_envs:
       PORT: "9707"
@@ -16,7 +16,7 @@ dependencies:
     container_labels: {}
   - role: core/container
     container_name: radarr-exporter
-    container_image: ghcr.io/onedr0p/exportarr:latest
+    container_image: ghcr.io/onedr0p/exportarr:v1.5.0
     container_command: radarr
     container_envs:
       PORT: "9708"
@@ -30,7 +30,7 @@ dependencies:
     container_labels: {}
   - role: core/container
     container_name: prowlarr-exporter
-    container_image: ghcr.io/onedr0p/exportarr:latest
+    container_image: ghcr.io/onedr0p/exportarr:v1.5.0
     container_command: prowlarr
     container_envs:
       PORT: "9710"
@@ -44,7 +44,7 @@ dependencies:
     container_labels: {}
   - role: core/container
     container_name: readarr-exporter
-    container_image: ghcr.io/onedr0p/exportarr:latest
+    container_image: ghcr.io/onedr0p/exportarr:v1.5.0
     container_command: readarr
     container_envs:
       PORT: "9711"
