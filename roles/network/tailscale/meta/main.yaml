@@ -1,0 +1,31 @@
+---
+dependencies:
+  - role: core/container
+    container_name: tailscale
+    container_image: ghcr.io/tailscale/tailscale:v1.84
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+    container_capabilities:
+      - NET_ADMIN
+      - SYS_MODULE
+    container_envs:
+      TS_HOSTNAME: "{{ hostname }}"
+      TS_AUTH_KEY: "{{ tailscale_auth_key }}"
+      TS_EXTRA_ARGS: "--advertise-exit-node --stateful-filtering=false --advertise-routes={{ traefik_internal_subnets }}"
+      TS_ACCEPT_DNS: "true"
+      TS_ENABLE_METRICS: "true"
+      TS_ENABLE_HEALTH_CHECK: "true"
+    container_devices:
+      - /dev/net/tun:/dev/net/tun
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/var/lib/tailscale:rw"
+    container_healthcheck:
+      test:
+        - CMD
+        - wget
+        - --spider
+        - -q
+        - "http://127.0.0.1:9002/healthz"
+    container_ssl_enabled: false
+    container_labels: {}
