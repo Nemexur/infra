@@ -1,7 +1,7 @@
 ---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
-    rev: v4.3.0
+    rev: v5.0.0
     hooks:
       - id: check-case-conflict
       - id: check-merge-conflict
@@ -18,11 +18,11 @@ repos:
         args:
           - --maxkb=1000
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.29.0
+    rev: v1.37.1
     hooks:
       - id: yamllint
   - repo: https://github.com/ansible/ansible-lint.git
-    rev: v6.17.1
+    rev: v25.6.1
     hooks:
       - id: ansible-lint
         args: [--offline]
