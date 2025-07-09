@@ -48,5 +48,8 @@
     devices: "{{ container_devices | default(omit) }}"
     sysctls: "{{ container_sysctls | default(omit) }}"
     volumes: "{{ container_volumes | default(omit) }}"
+    dns_opts: "{{ container_dns_opts | default(omit) }}"
+    dns_servers: "{{ container_dns_servers | default(omit) }}"
+    dns_search_domains: "{{ container_dns_search_domains | default(omit) }}"
     labels: "{{ container_ssl_enabled | default(true) | bool | ternary(_container_labels, container_labels) }}"
     recreate: "{{ (_container_directories is changed) or (_container_templates is changed) }}"
