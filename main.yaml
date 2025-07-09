@@ -112,6 +112,18 @@
         - twingate
         - network
       when: twingate_enabled | default(false) | bool
+    - role: network/tailscale
+      tags:
+        - tailscale
+        - network
+      when: tailscale_enabled | default(false) | bool
+    - role: network/xray
+      tags:
+        - xray
+        - network
+      when:
+        - inventory_hostname == lan_hosts.alice
+        - vpn_docker_network_enabled | default(false) | bool
     #
     # Apps/System
     #
@@ -153,6 +165,11 @@
     - role: apps/media/jellyfin
       tags:
         - jellyfin
+        - apps/media
+      when: inventory_hostname == lan_hosts.alice
+    - role: apps/media/emby
+      tags:
+        - emby
         - apps/media
       when: inventory_hostname == lan_hosts.alice
     - role: apps/media/plex
@@ -225,7 +242,7 @@
     #
     # System monitoring
     #
-    - role: geerlingguy.node_exporter
+    - role: monitoring/exporters/node
       tags:
         - node
         - exporters
