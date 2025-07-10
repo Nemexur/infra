@@ -1,0 +1,10 @@
+---
+url: "qbittorrent.{{ host_local }}"
+ipv4_address: "{{ traefik_internal_network_base }}.35"
+
+qbittorrent_webui_port: "8080"
+qbittorrent_torrenting_port: "6881"
+
+dashboard_name: qBittorrent
+dashboard_category: services
+dashboard_subtitle: Open-source software alternative to µTorrent.
