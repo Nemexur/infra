@@ -1,0 +1,39 @@
+---
+dependencies:
+  - role: core/container
+    container_name: tailscale-tun
+    container_image: ghcr.io/tailscale/tailscale:v1.84
+    container_directories:
+      - dest: "{{ docker_dir }}/{{ container_name }}"
+        owner: "{{ guid }}"
+    container_capabilities:
+      - NET_ADMIN
+      - SYS_MODULE
+    container_networks:
+      - name: "{{ traefik_internal_network_name }}"
+        ipv4_address: "{{ ipv4_address }}"
+        aliases:
+          - "{{ container_name }}"
+    container_envs:
+      TS_HOSTNAME: "{{ hostname }}-tun"
+      TS_AUTH_KEY: "{{ tailscale_tun_auth_key }}"
+      TS_EXTRA_ARGS: "--exit-node={{ tailscale_tun_exit_node }} --exit-node-allow-lan-access=true"
+      TS_ACCEPT_DNS: "true"
+      TS_USERSPACE: "true"
+      TS_ENABLE_METRICS: "true"
+      TS_ENABLE_HEALTH_CHECK: "true"
+      TS_OUTBOUND_HTTP_PROXY_LISTEN: ":{{ tailscale_tun_proxy_port }}"
+      TS_SOCKS5_SERVER: ":{{ tailscale_tun_proxy_port }}"
+    container_devices:
+      - /dev/net/tun:/dev/net/tun
+    container_volumes:
+      - "{{ docker_dir }}/{{ container_name }}:/var/lib/tailscale:rw"
+    container_healthcheck:
+      test:
+        - CMD
+        - wget
+        - --spider
+        - -q
+        - "http://127.0.0.1:9002/healthz"
+    container_ssl_enabled: false
+    container_labels: {}

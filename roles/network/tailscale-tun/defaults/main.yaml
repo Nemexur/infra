@@ -1,0 +1,6 @@
+---
+ipv4_address: "{{ traefik_internal_network_base }}.34"
+
+tailscale_tun_auth_key: ""
+tailscale_tun_proxy_port: 1055
+tailscale_tun_exit_node: ""
