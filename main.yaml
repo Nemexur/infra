@@ -144,6 +144,11 @@
         - transmission
         - apps/services
       when: inventory_hostname == lan_hosts.alice
+    - role: apps/services/qbittorrent
+      tags:
+        - qbittorrent
+        - apps/services
+      when: inventory_hostname == lan_hosts.alice
     - role: apps/services/nextcloud
       tags:
         - nextcloud
