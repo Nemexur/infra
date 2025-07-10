@@ -124,6 +124,13 @@
       when:
         - inventory_hostname == lan_hosts.alice
         - vpn_docker_network_enabled | default(false) | bool
+    - role: network/tailscale-tun
+      tags:
+        - tailscale-tun
+        - network
+      when:
+        - inventory_hostname == lan_hosts.alice
+        - vpn_docker_network_enabled | default(false) | bool
     #
     # Apps/System
     #
