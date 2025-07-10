@@ -2,7 +2,7 @@
 dependencies:
   - role: core/container
     container_name: mikrotik-exporter
-    container_image: ghcr.io/akpw/mktxp:latest
+    container_image: ghcr.io/akpw/mktxp:1.2.11
     container_command:
       - --cfg-dir=/mktxp
       - export
