@@ -61,16 +61,20 @@ Highlighted words indicate servers the tag is being used with. There are few mis
   - Network - setup and enable everything related to network.
     - [Traefik](https://traefik.io/) - web proxy and TLS certificates manager.
     - [Gluetun](https://github.com/qdm12/gluetun) - VPN client in a thin Docker container for multiple VPN providers, written in Go.
+    - [Tailscale](https://tailscale.com/) - WireGuard®-based VPN that eliminates single points of failure.
+    - [Twingate](https://twingate.com/) - Zero Trust Network Access that is easy to deploy, even easier to use, and always secure.
+    - [XRay](https://github.com/XTLS/Xray-core) - enhanced XTLS protocol that works as a VPN.
   - Containers - docker containers connected with traefik network.
     - Containers/System - everything that assists me in monitoring and controlling my services.
       - [cAdvisor](https://github.com/google/cadvisor) - analyzes resource usage and performance characteristics of running containers.
       - [Portainer](https://portainer.io/) - easily manage Docker and running containers.
       - [Diun](https://crazymax.dev/diun/) - receive notifications when a Docker image is updated on a Docker registry.
-      - [Uptime Kuma](https://uptime.kuma.pet/) - a fancy self-hosted monitoring tool.
+      - [Uptime Kuma](https://uptime.kuma.pet/) - a fancy self-hosted monitoring tool. (on the router now)
     - Containers/Media - everything to consume my media.
       - [Bazarr](https://github.com/morpheus65535/bazarr) - companion to Radarr and Sonarr for downloading subtitles.
       - [Jackett](https://github.com/Jackett/Jackett) - API Support for your favorite torrent trackers.
       - [Jellyfin](https://jellyfin.github.io) - the free software media system.
+      - [Emby](https://emby.media/) - take your media everywhere.
       - [Plex](https://www.plex.tv/) - you know... plex media server.
       - [Prowlarr](https://github.com/Prowlarr/Prowlarr) - indexer aggregator for Sonarr, Radarr, Lidarr, etc.
       - [Radarr](https://radarr.video/) - for organising and downloading movies.
@@ -81,7 +85,7 @@ Highlighted words indicate servers the tag is being used with. There are few mis
       - [Kaizoku](https://github.com/oae/kaizoku) - self-hosted manga downloader.
       - [Lazylibrarian](https://lazylibrarian.gitlab.io/) - follow authors and grab metadata for all your digital reading needs.
     - Containers/Services - everything that is not *Containers/Media*.
-      - [Pi-Hole](https://pi-hole.net/) - protects your devices from unwanted content.
+      - [Pi-Hole](https://pi-hole.net/) - protects your devices from unwanted content. (on the router now)
       - [Transmission](https://transmissionbt.com/) - my favorite BitTorrent client.
       - [Nextcloud](https://nextcloud.com/) - on-premise Universal File Access and sync platform.
   - Dashboard - dashboards for my applications.
@@ -114,14 +118,13 @@ Highlighted words indicate servers the tag is being used with. There are few mis
 - [x] Create universal role to run docker containers
 - [x] Create a new role to manage users and groups
 - [x] Better filesystem management
-- [ ] Support Authelia
 
 ### Misc
 
 - [ ] Refactor dashboard/homer
 - [x] Refactor enabling management
 - [x] Exclude open-vpn from cron docker backup
-- [ ] Better project structure
+- [x] Better project structure
 - [x] Refactor grafana dashboards management (templating)
 - [x] Rename home -> alice, monitoring -> bravo
 - [x] yml -> yaml
